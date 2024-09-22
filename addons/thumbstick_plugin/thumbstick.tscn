@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://b12am0c486o8a"]
+
+[node name="Thumbstick" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_right = 239.0
+offset_bottom = 75.0
+text = "Hello World"
