@@ -7,3 +7,4 @@
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Simple Joystick" parent="CanvasLayer" instance=ExtResource("1_yx48o")]
+_out_follow_radius_tolerance = 5.535

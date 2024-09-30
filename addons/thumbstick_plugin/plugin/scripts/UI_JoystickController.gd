@@ -26,23 +26,26 @@ const ITAP = THUMMBSTICK_CONSTANTS.TJC_INPUT_TAPONLY;
 const IHZT = THUMMBSTICK_CONSTANTS.TJC_INPUT_HORIZONTALONLY;
 const IVCT = THUMMBSTICK_CONSTANTS.TJC_INPUT_VERTICALONLY;
 const INOR = THUMMBSTICK_CONSTANTS.TJC_INPUT_NORMAL;
+const ASSETS_PATH = "res://addons/thumbstick_plugin/plugin/assets/";
 const MOUSE_FROM_TOUCH_SETTING = "input_devices/pointing/emulate_mouse_from_touch";
 const TOUCH_FROM_MOUSE_SETTING = "input_devices/pointing/emulate_touch_from_mouse";
 
+# TODO: Convert all export variables to property list.
+# Export informations.
 @export_group("Properties")
-## Joystick control mode used.
-@export_enum(MSTC, MDMC, MFLW) var _mode: String = MDMC;
 @export_enum(VALW, VTCS) var _joystick_visibility: String = VALW;
 # TODO: Make input mode works.
 @export_enum(IDSB, ITAP, IHZT, IVCT, INOR) var _input_mode: String = INOR;
-@export var _out_follow_radius_tolerance: float = 10.0;
 ## Maximum pixel radius on screen the inner joystick can be dragged.
 @export var _max_drag_radius: float = 56.0:
 	set(p_max_drag_radius):
 		if p_max_drag_radius < 0.0: p_max_drag_radius = 0.0;
 		_max_drag_radius = p_max_drag_radius;
 ## Move touch by distance in screen space to start trigger input.
-@export var _trigger_threshold: float = 16.0;
+@export var _trigger_threshold: float = 16.0:
+	set(p_threshold):
+		if p_threshold < 0.0: p_threshold = 0.0;
+		_trigger_threshold = p_threshold;
 ## Radius in percentage of deadzone, 
 ## if input [color=FFFF00]percent value[/color] less than the [b]Deadzone[/b] value, 
 ## it outputs as zero.
@@ -81,6 +84,25 @@ const TOUCH_FROM_MOUSE_SETTING = "input_devices/pointing/emulate_touch_from_mous
 @export_group("DEBUGGER")
 @export var _debug_mode: bool = false;
 @export var _editor_warnings: bool = false;
+
+# Extra export property variables.
+@export_group("Properties")
+## Joystick control mode used.
+var _mode: String = MDMC:
+	set(p_joystick_mode):
+		_mode = p_joystick_mode;
+		notify_property_list_changed();
+# TODO: Make extra static size triggerable.
+var _out_static_size_trigger: Vector2 = Vector2.ONE:
+	set(p_sst):
+		if p_sst.x < 0.0: p_sst.x = 0.0;
+		if p_sst.y < 0.0: p_sst.y = 0.0; 
+		_out_static_size_trigger = p_sst;
+# TODO: Fix Bug where the extra radius does not work.
+var _out_follow_radius_tolerance: float = 10.0:
+	set(p_ofradt):
+		if p_ofradt < 0.0: p_ofradt = 0.0;
+		_out_follow_radius_tolerance = p_ofradt;
 
 # Runtime variable data.
 @onready var _root: Window = get_tree().root;
@@ -128,6 +150,47 @@ func _exit_tree() -> void:
 	# Unsubscribe events.
 	_root.size_changed.disconnect(_on_viewport_size_changed);
 
+func _process(delta: float) -> void:
+	_running_in_editor = Engine.is_editor_hint();
+	if _running_in_editor: queue_redraw();
+
+func _draw() -> void:
+	if !_debug_mode: return;
+	var temp_color: Color;
+	var outer_half: Vector2 = _outer_joystick.size / 2.0;
+	var inner_half: Vector2 = _inner_joystick.size / 2.0;
+	var touch_area_pos: Vector2 = Vector2(0.0, 0.0);
+	var mid_joystick_pos: Vector2 = _outer_joystick.position + outer_half;
+	var radius_hint: float = inner_half.x + _max_drag_radius;
+	if _mode == MFLW:
+		temp_color = Color.ORANGE;
+		temp_color.a = 0.4;
+		draw_circle(mid_joystick_pos, radius_hint + _out_follow_radius_tolerance, temp_color);
+	temp_color = Color.RED;
+	temp_color.a = 0.5;
+	draw_circle(mid_joystick_pos, radius_hint, temp_color);
+	temp_color = Color.AQUAMARINE;
+	temp_color.a = 0.15;
+	if _mode == MDMC || _mode == MFLW:
+		draw_rect(Rect2(touch_area_pos, size), temp_color);
+	var static_extra_pos: Vector2 = Vector2.ZERO;
+	if _mode == MSTC:
+		var static_trigger_half: Vector2 = _out_static_size_trigger / 2.0;
+		static_extra_pos = _outer_joystick.position - static_trigger_half;
+		var static_extra_size: Vector2 = _outer_joystick.size + _out_static_size_trigger;
+		draw_rect(Rect2(static_extra_pos, static_extra_size), temp_color);
+	temp_color = Color.YELLOW;
+	temp_color.a = 0.65;
+	touch_area_pos += Vector2(4.0, 16.0);
+	if _mode == MDMC || _mode == MFLW:
+		draw_string(ThemeDB.fallback_font, touch_area_pos,
+			"Dynamic Trigger Area" if _mode == MDMC else "Dynamic Follow Trigger Area",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 16, temp_color);
+	elif _mode == MSTC:
+		static_extra_pos += Vector2(4.0, -4.0);
+		draw_string(ThemeDB.fallback_font, static_extra_pos, "Static Trigger Area",
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 12, temp_color);
+
 func _input(event: InputEvent) -> void:
 	_running_in_editor = Engine.is_editor_hint();
 	if _running_in_editor: return;
@@ -138,6 +201,8 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		_input_screen_drag(event as InputEventScreenDrag, _unix_time);
 	_on_display_update();
+	if !_debug_mode: return;
+	queue_redraw();
 
 func _input_screen_touch(e: InputEventScreenTouch, t: float) -> void:
 	_touch_position_cache = e.position;
@@ -296,6 +361,48 @@ func _on_display_update() -> void:
 	_inner_joystick.set_global_position(_expected_inner_position);
 	_outer_joystick.self_modulate = _expected_outer_color;
 	_inner_joystick.self_modulate = _expected_inner_color;
+
+#region Property Drawer
+func _get_property_list() -> Array[Dictionary]:
+	var r: Array[Dictionary] = [{
+		"name": &"_mode",
+		"type": TYPE_STRING_NAME,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": "%s,%s,%s" % [MSTC, MDMC, MFLW],
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}];
+	if _mode == MSTC:
+		r.append({
+			"name": &"_out_static_size_trigger",
+			"type": TYPE_VECTOR2,
+			"hint": PROPERTY_HINT_NONE,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		});
+	if _mode == MFLW:
+		r.append({
+			"name": &"_out_follow_radius_tolerance",
+			"type": TYPE_FLOAT,
+			"hint": PROPERTY_HINT_NONE,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		});
+	return r;
+
+func _property_can_revert(property: StringName) -> bool:
+	match property:
+		&"_mode":
+			if _mode == MDMC: return false;
+			return true;
+		&"_out_follow_radius_tolerance":
+			if _out_follow_radius_tolerance == 10.0: return false;
+			return true;
+		_: return false;
+
+func _property_get_revert(property: StringName) -> Variant:
+	match property:
+		&"_mode": return MDMC;
+		&"_out_follow_radius_tolerance": return 10.0;
+		_: return null;
+#endregion
 
 func set_joystick_mode(mode: String) -> void:
 	_mode = mode;

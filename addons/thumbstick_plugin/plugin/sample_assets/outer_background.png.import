@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c1mcwfteyrsiy"
-path="res://.godot/imported/outer_background.png-940b26de564a7db5aade2a96d80a81e3.ctex"
+path="res://.godot/imported/outer_background.png-51a06f967615cc05e4ad420b7fd6207c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/thumbstick_plugin/plugin/assets/outer_background.png"
-dest_files=["res://.godot/imported/outer_background.png-940b26de564a7db5aade2a96d80a81e3.ctex"]
+source_file="res://addons/thumbstick_plugin/plugin/sample_assets/outer_background.png"
+dest_files=["res://.godot/imported/outer_background.png-51a06f967615cc05e4ad420b7fd6207c.ctex"]
 
 [params]
 
