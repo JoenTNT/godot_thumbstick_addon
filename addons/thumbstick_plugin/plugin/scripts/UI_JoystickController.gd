@@ -21,88 +21,144 @@ const MDMC = THUMMBSTICK_CONSTANTS.TJC_MODE_DYNAMIC;
 const MFLW = THUMMBSTICK_CONSTANTS.TJC_MODE_FOLLOW;
 const VALW = THUMMBSTICK_CONSTANTS.TJC_VISIBILITY_ALWAYS;
 const VTCS = THUMMBSTICK_CONSTANTS.TJC_VISIBILITY_TOUCHSCREEN;
-const IDSB = THUMMBSTICK_CONSTANTS.TJC_INPUT_DISABLED;
-const ITAP = THUMMBSTICK_CONSTANTS.TJC_INPUT_TAPONLY;
 const IHZT = THUMMBSTICK_CONSTANTS.TJC_INPUT_HORIZONTALONLY;
 const IVCT = THUMMBSTICK_CONSTANTS.TJC_INPUT_VERTICALONLY;
 const INOR = THUMMBSTICK_CONSTANTS.TJC_INPUT_NORMAL;
 const ASSETS_PATH = "res://addons/thumbstick_plugin/plugin/assets/";
 const MOUSE_FROM_TOUCH_SETTING = "input_devices/pointing/emulate_mouse_from_touch";
 const TOUCH_FROM_MOUSE_SETTING = "input_devices/pointing/emulate_touch_from_mouse";
+const DEFAULT_FOLLOW_RADIUS_TOLERANCE: float = 10.0;
+const DEFAULT_EXTEND_STATIC_AREA_TRIGGER: Vector2 = Vector2(24.0, 24.0);
+const DEFAULT_MAX_PULL_RADIUS: float = 64.0;
+const DEFAULT_START_TRIGGER_THRESHOLD: float = 16.0;
+const DEFAULT_DEADZONE_PERCENT: float = 0.2;
+const DEFAULT_CANCEL_TAP_TRIGGER_THRESHOLD: float = 0.2;
+const DEFAULT_STYLE: Dictionary = {
+	"base_color": Color.WHITE,
+	"normal_background_tint": Color.WHITE,
+	"normal_handle_tint": Color.WHITE,
+	"pressed_background_tint": Color.WHITE,
+	"pressed_handle_tint": Color.GRAY,
+	"disabled_background_tint": Color(0.6, 0.6, 0.6, 0.4),
+	"disabled_handle_tint": Color(0.6, 0.6, 0.6, 0.4),
+	"transparent_background_tint": Color(1.0, 1.0, 1.0, 0.35),
+	"transparent_handle_tint": Color(1.0, 1.0, 1.0, 0.5),
+};
+const DEFAULT_TRIGGER_FUNCTIONS: Dictionary = {
+	"on_trigger_method": "on_trigger",
+	"on_pressed_method": "on_pressed",
+	"on_released_method": "on_released",
+	"on_tap_method": "on_tap",
+};
 
-# TODO: Convert all export variables to property list.
-# Export informations.
-@export_group("Properties")
-@export_enum(VALW, VTCS) var _joystick_visibility: String = VALW;
-# TODO: Make input mode works.
-@export_enum(IDSB, ITAP, IHZT, IVCT, INOR) var _input_mode: String = INOR;
-## Maximum pixel radius on screen the inner joystick can be dragged.
-@export var _max_drag_radius: float = 56.0:
-	set(p_max_drag_radius):
-		if p_max_drag_radius < 0.0: p_max_drag_radius = 0.0;
-		_max_drag_radius = p_max_drag_radius;
-## Move touch by distance in screen space to start trigger input.
-@export var _trigger_threshold: float = 16.0:
-	set(p_threshold):
-		if p_threshold < 0.0: p_threshold = 0.0;
-		_trigger_threshold = p_threshold;
-## Radius in percentage of deadzone, 
-## if input [color=FFFF00]percent value[/color] less than the [b]Deadzone[/b] value, 
-## it outputs as zero.
-@export_range(0.0, 1.0) var _dead_zone: float = 0.2;
-## The seconds between 
-@export_range(0.0, 12.0) var _tap_cancel_threshold: float = 0.2;
-## Elapsed seconds begin when joystick first time triggered instead of pressed.
-@export var _elapse_start_on_trigger: bool = true;
-## Resulting 0 and 1 instead of using range between.
-@export var _normalize_input: bool = false;
-## If [code]true[/code], then input value result will be negated.
-@export var _inverse_input_v: bool = false;
-## Joystick disabled state.
-# TODO: Will be removed due to already input mode.
-@export var _disabled: bool = false;
-
-@export_group("Coloring Style")
-## Joystick base color, will be multiplied by tint colors in runtime.
-@export var _base_color: Color = Color.WHITE;
-@export var _inner_normal_tint: Color = Color.WHITE;
-@export var _bg_normal_tint = Color.WHITE;
-@export var _inner_pressed_tint: Color = Color.GRAY;
-@export var _bg_pressed_tint = Color.WHITE;
-@export var _inner_disabled_int: Color = Color(0.6, 0.6, 0.6, 0.4);
-@export var _bg_disabled_tint = Color(0.6, 0.6, 0.6, 0.4);
-
-@export_group("Optional Dependency")
-## Once it is filled, all methods inside the node will be called.
-@export var control_target_node: Node = null;
-# These methods is automatically called if target was filled.
-@export var _on_trigger_method_name: String = "on_trigger";
-@export var _on_tap_method_name: String = "on_tap";
-@export var _on_pressed_method_name: String = "on_pressed";
-@export var _on_released_method_name: String = "on_released";
-
-@export_group("DEBUGGER")
-@export var _debug_mode: bool = false;
-@export var _editor_warnings: bool = false;
-
-# Extra export property variables.
-@export_group("Properties")
+# Properties
 ## Joystick control mode used.
 var _mode: String = MDMC:
 	set(p_joystick_mode):
 		_mode = p_joystick_mode;
 		notify_property_list_changed();
+var _visibility_mode: String = VALW:
+	set(p_visibility):
+		_visibility_mode = p_visibility;
+		notify_property_list_changed();
+# TODO: Make input mode works.
+var _input_mode: String = INOR;
 # TODO: Make extra static size triggerable.
-var _out_static_size_trigger: Vector2 = Vector2.ONE:
+var extend_static_area_trigger: Vector2 = DEFAULT_EXTEND_STATIC_AREA_TRIGGER:
 	set(p_sst):
 		if p_sst.x < 0.0: p_sst.x = 0.0;
 		if p_sst.y < 0.0: p_sst.y = 0.0; 
-		_out_static_size_trigger = p_sst;
+		extend_static_area_trigger = p_sst;
 # TODO: Fix Bug where the extra radius does not work.
-var _out_follow_radius_tolerance: float = 10.0:
+## Extra radius in follow mode,
+## prevents joystick display move until exceeds this tolerance.
+var follow_radius_tolerance: float = DEFAULT_FOLLOW_RADIUS_TOLERANCE:
 	set(p_ofradt):
 		if p_ofradt < 0.0: p_ofradt = 0.0;
-		_out_follow_radius_tolerance = p_ofradt;
+		follow_radius_tolerance = p_ofradt;
+## Maximum pixel radius on screen the inner joystick can be dragged.
+var max_drag_radius: float = DEFAULT_MAX_PULL_RADIUS:
+	set(p_max_drag_radius):
+		if p_max_drag_radius < 0.0: p_max_drag_radius = 0.0;
+		max_drag_radius = p_max_drag_radius;
+## Move touch by distance in screen space to start trigger input.
+var start_trigger_threshold: float = DEFAULT_START_TRIGGER_THRESHOLD:
+	set(p_threshold):
+		if p_threshold < 0.0: p_threshold = 0.0;
+		start_trigger_threshold = p_threshold;
+## Radius in percentage of deadzone, 
+## if [color=FFFF00]percentage value[/color] less than the [b]Deadzone[/b], 
+## it outputs zero.
+var deadzone_radius_percentage: float = DEFAULT_DEADZONE_PERCENT;
+## The seconds allowed to cancel a tap input.
+var cancel_tap_trigger_threshold: float = DEFAULT_CANCEL_TAP_TRIGGER_THRESHOLD:
+	set(p_cancel_thrsld):
+		if p_cancel_thrsld < 0.0: p_cancel_thrsld = 0.0;
+		cancel_tap_trigger_threshold = p_cancel_thrsld;
+## Elapsed seconds begin when the joystick is first triggered instead of pressed.
+var start_elapsed_on_trigger: bool = true;
+## Resulting output only equal 0 or 1 instead of using range between.
+var normalize_output: bool = false;
+## If [code]true[/code], then output value will be negated.
+var inverse_output: bool = false;
+## Enable or disable tap trigger functionality.
+var enable_tap_trigger: bool = true:
+	set(p_enabled):
+		enable_tap_trigger = p_enabled;
+		notify_property_list_changed();
+## Joystick disabled state.
+var joystick_disabled: bool = false;
+
+# Styles
+## Joystick base color, will be multiplied by tint colors in runtime.
+var _base_color: Color = DEFAULT_STYLE["base_color"];
+## Multiply color tint for background with base color at normal state.
+var _normal_bg_tint: Color = DEFAULT_STYLE["normal_background_tint"];
+## Multiply color tint for inner handle with base color at normal state.
+var _normal_handle_tint: Color = DEFAULT_STYLE["normal_handle_tint"];
+## Multiply color tint for background with base color at pressed state.
+var _pressed_bg_tint: Color = DEFAULT_STYLE["pressed_background_tint"];
+## Multiply color tint for inner handle with base color at pressed state.
+var _pressed_handle_tint: Color = DEFAULT_STYLE["pressed_handle_tint"];
+## Multiply color tint for background with base color at disabled state.
+var _disabled_bg_tint: Color = DEFAULT_STYLE["disabled_background_tint"];
+## Multiply color tint for inner handle with base color at disabled state.
+var _disabled_handle_tint: Color = DEFAULT_STYLE["disabled_handle_tint"];
+## Invisible colored background tint for inactive touch screen visibility mode
+## only when the joystick is not being touched.
+var _transparent_bg_tint: Color = DEFAULT_STYLE["transparent_background_tint"];
+## Invisible colored inner handle tint for inactive touch screen visibility mode
+## only when the joystick is not being touched.
+var _transparent_handle_tint: Color = DEFAULT_STYLE["transparent_handle_tint"];
+
+# Controlling target.
+## Once it is filled, all methods inside the node will be called.
+var control_target_node: Node = null;
+# These methods is automatically called if target was filled.
+## Calling method on trigger ([color=FE861A][b]Control Target Node[/b][/color] must be filled)
+var _on_trigger_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_trigger_method"];
+## Calling method on pressed ([color=FE861A][b]Control Target Node[/b][/color] must be filled)
+var _on_pressed_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_pressed_method"];
+## Calling method on released ([color=FE861A][b]Control Target Node[/b][/color] must be filled)
+var _on_released_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_released_method"];
+## Calling method on tap ([color=FE861A][b]Control Target Node[/b][/color] must be filled)
+var _on_tap_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_tap_method"];
+
+# Debugger
+## Open debug mode, only works in editor.
+var _debug_mode: bool = false:
+	set(p_debug):
+		_debug_mode = p_debug;
+		notify_property_list_changed();
+## Visualization control hint in scene for development purpose.
+var _visualize_gizmos: bool = true;
+## Open subgroup of statistic in Inspector when the game is running.
+var _simulate_editor_testing: bool = false:
+	set(p_debug):
+		_simulate_editor_testing = p_debug;
+		notify_property_list_changed();
+## Notice developer for editor only warnings.
+var _editor_warnings: bool = true;
 
 # Runtime variable data.
 @onready var _root: Window = get_tree().root;
@@ -125,6 +181,314 @@ var _expected_outer_position: Vector2 = Vector2.ZERO;
 var _expected_inner_position: Vector2 = Vector2.ZERO;
 var _expected_outer_color: Color = Color.BLACK;
 var _expected_inner_color: Color = Color.BLACK;
+var _inside_deadzone: bool = false;
+
+#region Property Drawer
+func _get_property_list() -> Array[Dictionary]:
+	var r: Array[Dictionary] = [{
+		"name": "Main Properties",
+		"type": TYPE_STRING_NAME,
+		"usage": PROPERTY_USAGE_GROUP,
+	}, {
+		"name": &"_mode",
+		"type": TYPE_STRING_NAME,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": "%s,%s,%s" % [MSTC, MDMC, MFLW],
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}];
+	r.append_array([{
+		"name": &"_visibility_mode",
+		"type": TYPE_STRING_NAME,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": "%s,%s" % [VALW, VTCS],
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_input_mode",
+		"type": TYPE_STRING_NAME,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": "%s,%s,%s" % [IHZT, IVCT, INOR],
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": "Controller Settings",
+		"type": TYPE_STRING_NAME,
+		"usage": PROPERTY_USAGE_SUBGROUP,
+	}]);
+	if _mode == MSTC:
+		r.append({
+			"name": &"extend_static_area_trigger",
+			"type": TYPE_VECTOR2,
+			"hint": PROPERTY_HINT_NONE,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		});
+	if _mode == MFLW:
+		r.append({
+			"name": &"follow_radius_tolerance",
+			"type": TYPE_FLOAT,
+			"hint": PROPERTY_HINT_NONE,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		});
+	r.append_array([{
+		"name": &"max_drag_radius",
+		"type": TYPE_FLOAT,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"start_trigger_threshold",
+		"type": TYPE_FLOAT,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"deadzone_radius_percentage",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "%f,%f" % [0.0, 1.0],
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"start_elapsed_on_trigger",
+		"type": TYPE_BOOL,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"normalize_output",
+		"type": TYPE_BOOL,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"inverse_output",
+		"type": TYPE_BOOL,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"enable_tap_trigger",
+		"type": TYPE_BOOL,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}]);
+	if enable_tap_trigger:
+		r.append({
+			"name": &"cancel_tap_trigger_threshold",
+			"type": TYPE_FLOAT,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		})
+	r.append_array([{
+		"name": "Editable Status",
+		"type": TYPE_STRING_NAME,
+		"usage": PROPERTY_USAGE_SUBGROUP,
+	}, {
+		"name": &"joystick_disabled",
+		"type": TYPE_BOOL,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}]);
+	r.append_array([{
+		"name": "Style",
+		"type": TYPE_STRING_NAME,
+		"usage": PROPERTY_USAGE_GROUP,
+	}, {
+		"name": &"_base_color",
+		"type": TYPE_COLOR,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_normal_bg_tint",
+		"type": TYPE_COLOR,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_normal_handle_tint",
+		"type": TYPE_COLOR,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_pressed_bg_tint",
+		"type": TYPE_COLOR,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_pressed_handle_tint",
+		"type": TYPE_COLOR,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_disabled_bg_tint",
+		"type": TYPE_COLOR,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_disabled_handle_tint",
+		"type": TYPE_COLOR,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}]);
+	if _visibility_mode == VTCS:
+		r.append_array([{
+			"name": &"_transparent_bg_tint",
+			"type": TYPE_COLOR,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		}, {
+			"name": &"_transparent_handle_tint",
+			"type": TYPE_COLOR,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		}]);
+	r.append_array([{
+		"name": "Single Control Target",
+		"type": TYPE_STRING_NAME,
+		"usage": PROPERTY_USAGE_GROUP,
+	}, {
+		"name": &"control_target_node",
+		"type": TYPE_NODE_PATH,
+		"hint": PROPERTY_HINT_NODE_TYPE,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_on_trigger_method_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_on_pressed_method_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_on_released_method_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_on_tap_method_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}]);
+	r.append_array([{
+		"name": "Debugger",
+		"type": TYPE_STRING_NAME,
+		"usage": PROPERTY_USAGE_GROUP,
+	}, {
+		"name": &"_debug_mode",
+		"type": TYPE_BOOL,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}]);
+	if _debug_mode:
+		r.append_array([{
+			"name": "Debug Mode Activators",
+			"type": TYPE_STRING_NAME,
+			"usage": PROPERTY_USAGE_SUBGROUP,
+		}, {
+			"name": &"_visualize_gizmos",
+			"type": TYPE_BOOL,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		}, {
+			"name": &"_simulate_editor_testing",
+			"type": TYPE_BOOL,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		}]);
+	r.append_array([{
+		"name": "Debugger",
+		"type": TYPE_STRING_NAME,
+		"usage": PROPERTY_USAGE_GROUP,
+	}, {
+		"name": &"_editor_warnings",
+		"type": TYPE_BOOL,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}]);
+	if _simulate_editor_testing:
+		# TODO: Draw cached informations in inspector.
+		r.append_array([{
+			"name": "Simulation Statistic (COMING SOON)",
+			"type": TYPE_STRING_NAME,
+			"usage": PROPERTY_USAGE_GROUP,
+		}, {
+			"name": &"_inside_deadzone",
+			"type": TYPE_BOOL,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}]);
+	return r;
+
+func _property_can_revert(property: StringName) -> bool:
+	match property:
+		&"_mode": return _mode != MDMC;
+		&"_visibility_mode": return _visibility_mode != VALW;
+		&"_input_mode": return _input_mode != INOR;
+		&"max_drag_radius": return max_drag_radius != DEFAULT_MAX_PULL_RADIUS;
+		&"start_trigger_threshold":
+			return start_trigger_threshold != DEFAULT_START_TRIGGER_THRESHOLD;
+		&"deadzone_radius_percentage":
+			return deadzone_radius_percentage != DEFAULT_DEADZONE_PERCENT;
+		&"cancel_tap_trigger_threshold":
+			return cancel_tap_trigger_threshold != DEFAULT_CANCEL_TAP_TRIGGER_THRESHOLD;
+		&"start_elapsed_on_trigger": return start_elapsed_on_trigger;
+		&"normalize_output": return normalize_output;
+		&"inverse_output": return inverse_output;
+		&"enable_tap_trigger": return enable_tap_trigger;
+		&"joystick_disabled": return joystick_disabled;
+		&"follow_radius_tolerance":
+			return follow_radius_tolerance != DEFAULT_FOLLOW_RADIUS_TOLERANCE;
+		&"extend_static_area_trigger":
+			return extend_static_area_trigger != DEFAULT_EXTEND_STATIC_AREA_TRIGGER;
+		&"_base_color":
+			return _base_color != DEFAULT_STYLE["base_color"];
+		&"_normal_bg_tint":
+			return _normal_bg_tint != DEFAULT_STYLE["normal_background_tint"];
+		&"_normal_handle_tint":
+			return _normal_handle_tint != DEFAULT_STYLE["normal_handle_tint"];
+		&"_pressed_bg_tint":
+			return _pressed_bg_tint != DEFAULT_STYLE["pressed_background_tint"];
+		&"_pressed_handle_tint":
+			return _pressed_handle_tint != DEFAULT_STYLE["pressed_handle_tint"];
+		&"_disabled_bg_tint":
+			return _disabled_bg_tint != DEFAULT_STYLE["disabled_background_tint"];
+		&"_disabled_handle_tint":
+			return _disabled_handle_tint != DEFAULT_STYLE["disabled_handle_tint"];
+		&"_transparent_bg_tint":
+			return _transparent_bg_tint != DEFAULT_STYLE["transparent_background_tint"];
+		&"_transparent_handle_tint":
+			return _transparent_handle_tint != DEFAULT_STYLE["transparent_handle_tint"];
+		&"control_target_node": return control_target_node != null;
+		&"_on_trigger_method_name":
+			return _on_trigger_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_trigger_method"];
+		&"_on_pressed_method_name":
+			return _on_pressed_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_pressed_method"];
+		&"_on_released_method_name":
+			return _on_released_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_released_method"];
+		&"_on_tap_method_name":
+			return _on_tap_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_tap_method"];
+		&"_debug_mode": return _debug_mode;
+		&"_editor_warnings": return !_editor_warnings;
+		&"_visualize_gizmos": return !_visualize_gizmos;
+		&"_simulate_editor_testing": return _simulate_editor_testing;
+		_: return false;
+
+func _property_get_revert(property: StringName) -> Variant:
+	match property:
+		&"_mode": return MDMC;
+		&"_visibility_mode": return VALW;
+		&"_input_mode": return INOR;
+		&"max_drag_radius": return DEFAULT_MAX_PULL_RADIUS;
+		&"start_trigger_threshold": return DEFAULT_START_TRIGGER_THRESHOLD;
+		&"deadzone_radius_percentage": return DEFAULT_DEADZONE_PERCENT;
+		&"cancel_tap_trigger_threshold": return DEFAULT_CANCEL_TAP_TRIGGER_THRESHOLD;
+		&"start_elapsed_on_trigger": return false;
+		&"normalize_output": return false;
+		&"inverse_output": return false;
+		&"enable_tap_trigger": return false;
+		&"joystick_disabled": return false;
+		&"follow_radius_tolerance": return DEFAULT_FOLLOW_RADIUS_TOLERANCE;
+		&"extend_static_area_trigger": return DEFAULT_EXTEND_STATIC_AREA_TRIGGER;
+		&"_base_color": return DEFAULT_STYLE["base_color"];
+		&"_normal_bg_tint": return DEFAULT_STYLE["normal_background_tint"];
+		&"_normal_handle_tint": return DEFAULT_STYLE["normal_handle_tint"];
+		&"_pressed_bg_tint": return DEFAULT_STYLE["pressed_background_tint"];
+		&"_pressed_handle_tint": return DEFAULT_STYLE["pressed_handle_tint"];
+		&"_disabled_bg_tint": return DEFAULT_STYLE["disabled_background_tint"];
+		&"_disabled_handle_tint": return DEFAULT_STYLE["disabled_handle_tint"];
+		&"_transparent_bg_tint": return DEFAULT_STYLE["transparent_background_tint"];
+		&"_transparent_handle_tint": return DEFAULT_STYLE["transparent_handle_tint"];
+		&"control_target_node": return null;
+		&"_on_trigger_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_trigger_method"];
+		&"_on_pressed_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_pressed_method"];
+		&"_on_released_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_released_method"];
+		&"_on_tap_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_tap_method"];
+		&"_debug_mode": return false;
+		&"_editor_warnings": return true;
+		&"_visualize_gizmos": return true;
+		&"_simulate_editor_testing": return false;
+		_: return null;
+
+# TODO: Editor runtime update buttons in inspector.
+func _add_inspector_buttons() -> Array[Dictionary]:
+	var btns: Array[Dictionary] = [{
+		"name": "Debug Mode %s" % ("On" if _debug_mode else "Off"),
+		"pressed": _on_inspector_debug_mode_button_pressed,
+	}];
+	return btns;
+
+func _on_inspector_debug_mode_button_pressed() -> void:
+	_debug_mode = !_debug_mode;
+	notify_property_list_changed();
+#endregion
 
 func _ready() -> void:
 	_running_in_editor = Engine.is_editor_hint();
@@ -140,7 +504,7 @@ func _ready() -> void:
 	if _running_in_editor: return;
 	_expected_inner_position = _inner_origin_position;
 	_expected_outer_position = _outer_origin_position;
-	set_disabled(_disabled);
+	set_disabled(joystick_disabled);
 	# Subscribe events.
 	_root.size_changed.connect(_on_viewport_size_changed);
 
@@ -152,32 +516,50 @@ func _exit_tree() -> void:
 
 func _process(delta: float) -> void:
 	_running_in_editor = Engine.is_editor_hint();
-	if _running_in_editor: queue_redraw();
+	if !_running_in_editor: return;
+	queue_redraw();
+	# Handle Color Preview.
+	if joystick_disabled:
+		_outer_joystick.self_modulate = _disabled_bg_tint;
+		_inner_joystick.self_modulate = _disabled_handle_tint;
+	elif _visibility_mode == VTCS:
+		_outer_joystick.self_modulate = _transparent_bg_tint;
+		_inner_joystick.self_modulate = _transparent_handle_tint;
+	else:
+		_outer_joystick.self_modulate = _normal_bg_tint;
+		_inner_joystick.self_modulate = _normal_handle_tint;
 
 func _draw() -> void:
-	if !_debug_mode: return;
+	if !_debug_mode || !_visualize_gizmos: return;
 	var temp_color: Color;
+	if _outer_joystick == null: _outer_joystick = $"Outer BG";
 	var outer_half: Vector2 = _outer_joystick.size / 2.0;
+	if _inner_joystick == null: _inner_joystick = $"Outer BG/Inner CTRL";
 	var inner_half: Vector2 = _inner_joystick.size / 2.0;
 	var touch_area_pos: Vector2 = Vector2(0.0, 0.0);
 	var mid_joystick_pos: Vector2 = _outer_joystick.position + outer_half;
-	var radius_hint: float = inner_half.x + _max_drag_radius;
+	var radius_hint: float = inner_half.x + max_drag_radius;
 	if _mode == MFLW:
 		temp_color = Color.ORANGE;
 		temp_color.a = 0.4;
-		draw_circle(mid_joystick_pos, radius_hint + _out_follow_radius_tolerance, temp_color);
-	temp_color = Color.RED;
-	temp_color.a = 0.5;
+		draw_circle(mid_joystick_pos, radius_hint + follow_radius_tolerance, temp_color);
+	# Coloring Max Pull Radius.
+	temp_color = Color.GREEN;
+	temp_color.a = 0.3;
 	draw_circle(mid_joystick_pos, radius_hint, temp_color);
+	var dead_zone_radius = inner_half.x + max_drag_radius * deadzone_radius_percentage;
+	temp_color = Color.RED;
+	temp_color.a = 0.7;
+	draw_circle(mid_joystick_pos, dead_zone_radius, temp_color);
 	temp_color = Color.AQUAMARINE;
 	temp_color.a = 0.15;
 	if _mode == MDMC || _mode == MFLW:
 		draw_rect(Rect2(touch_area_pos, size), temp_color);
 	var static_extra_pos: Vector2 = Vector2.ZERO;
 	if _mode == MSTC:
-		var static_trigger_half: Vector2 = _out_static_size_trigger / 2.0;
+		var static_trigger_half: Vector2 = extend_static_area_trigger / 2.0;
 		static_extra_pos = _outer_joystick.position - static_trigger_half;
-		var static_extra_size: Vector2 = _outer_joystick.size + _out_static_size_trigger;
+		var static_extra_size: Vector2 = _outer_joystick.size + extend_static_area_trigger;
 		draw_rect(Rect2(static_extra_pos, static_extra_size), temp_color);
 	temp_color = Color.YELLOW;
 	temp_color.a = 0.65;
@@ -194,7 +576,7 @@ func _draw() -> void:
 func _input(event: InputEvent) -> void:
 	_running_in_editor = Engine.is_editor_hint();
 	if _running_in_editor: return;
-	if _disabled: return;
+	if joystick_disabled: return;
 	_unix_time = Time.get_unix_time_from_system();
 	if event is InputEventScreenTouch:
 		_input_screen_touch(event as InputEventScreenTouch, _unix_time);
@@ -221,15 +603,15 @@ func _input_screen_drag(e: InputEventScreenDrag, t: float) -> void:
 	if _is_triggered:
 		_on_trigger(_drag_position, t - _elapsed_time_started);
 		return;
-	if !_is_trigger(_start_press_position, _drag_position, _trigger_threshold):
+	if !_is_trigger(_start_press_position, _drag_position, start_trigger_threshold):
 		_on_before_trigger(_drag_position, t - _elapsed_time_started);
 		return;
-	if _elapse_start_on_trigger: _elapsed_time_started = t;
+	if start_elapsed_on_trigger: _elapsed_time_started = t;
 	_is_triggered = true;
 
 func _on_pressed(start_point: Vector2, start_t: float) -> void:
 	_start_press_position = start_point;
-	if !_elapse_start_on_trigger: _elapsed_time_started = start_t;
+	if !start_elapsed_on_trigger: _elapsed_time_started = start_t;
 	# Calculate input, setting status, and predict display update.
 	var outer_half: Vector2 = _outer_joystick.size / 2.0;
 	match _mode:
@@ -241,8 +623,8 @@ func _on_pressed(start_point: Vector2, start_t: float) -> void:
 			_is_pressed = true;
 			_expected_outer_position = _start_press_position - outer_half;
 			_expected_inner_position = _start_press_position - _inner_joystick.size / 2.0;
-			_expected_outer_color = _base_color * _bg_pressed_tint;
-			_expected_inner_color = _base_color * _inner_pressed_tint;
+			_expected_outer_color = _base_color * _pressed_bg_tint;
+			_expected_inner_color = _base_color * _pressed_handle_tint;
 	# Call Event
 	if control_target_node != null:
 		if control_target_node.has_method(_on_pressed_method_name):
@@ -261,41 +643,41 @@ func _on_trigger(point: Vector2, elapsed: float):
 	var inner_half: Vector2 = _inner_joystick.size / 2.0;
 	var normal_dir: Vector2 = _trigger_direction.normalized();
 	var final_result: Vector2;
-	var is_deadzone: bool; var input_v: float; 
+	var input_v: float; 
 	match _mode:
 		MDMC, MSTC:
-			if _trigger_magnitude > _max_drag_radius:
-				_trigger_direction = normal_dir * _max_drag_radius;
+			if _trigger_magnitude > max_drag_radius:
+				_trigger_direction = normal_dir * max_drag_radius;
 				_trigger_magnitude = _trigger_direction.length();
-			input_v = _trigger_magnitude / _max_drag_radius;
-			is_deadzone = input_v <= _dead_zone;
+			input_v = _trigger_magnitude / max_drag_radius;
+			_inside_deadzone = input_v <= deadzone_radius_percentage;
 			_expected_inner_position = _start_press_position + _trigger_direction - inner_half;
-			if is_deadzone:
+			if _inside_deadzone:
 				_trigger_direction = Vector2(0.0, 0.0);
 				_trigger_magnitude = 0.0;
 				input_v = 0.0;
-			if _normalize_input: input_v = 1.0;
-			final_result = (-1 if _inverse_input_v else 1) * normal_dir * input_v;
+			if normalize_output: input_v = 1.0;
+			final_result = (-1 if inverse_output else 1) * normal_dir * input_v;
 		MFLW:
 			var move_outer_rad: float = 0.0;
-			var out_tol: float = _max_drag_radius + _out_follow_radius_tolerance;
+			var out_tol: float = max_drag_radius + follow_radius_tolerance;
 			if _trigger_magnitude > out_tol:
 				move_outer_rad = _trigger_magnitude - out_tol;
-			if _trigger_magnitude > _max_drag_radius:
-				_trigger_direction = normal_dir * _max_drag_radius;
+			if _trigger_magnitude > max_drag_radius:
+				_trigger_direction = normal_dir * max_drag_radius;
 				_trigger_magnitude = _trigger_direction.length();
 			var outer_half: Vector2 = _outer_joystick.size / 2.0;
 			_start_press_position += normal_dir * move_outer_rad;
 			_expected_outer_position = _start_press_position - outer_half;
 			_expected_inner_position = _start_press_position + _trigger_direction - inner_half;
-			input_v = _trigger_magnitude / _max_drag_radius;
-			is_deadzone = input_v <= _dead_zone;
-			if is_deadzone:
+			input_v = _trigger_magnitude / max_drag_radius;
+			_inside_deadzone = input_v <= deadzone_radius_percentage;
+			if _inside_deadzone:
 				_trigger_direction = Vector2(0.0, 0.0);
 				_trigger_magnitude = 0.0;
 				input_v = 0.0;
-			if _normalize_input: input_v = 1.0;
-			final_result = (-1 if _inverse_input_v else 1) * normal_dir * input_v;
+			if normalize_output: input_v = 1.0;
+			final_result = (-1 if inverse_output else 1) * normal_dir * input_v;
 	# Call event.
 	if control_target_node != null:
 		if control_target_node.has_method(_on_trigger_method_name):
@@ -306,7 +688,7 @@ func _on_trigger(point: Vector2, elapsed: float):
 			"xDir": "%.f" % _trigger_direction.x,
 			"yDir": "%.f" % _trigger_direction.y,
 			"mag": "%.2f" % _trigger_magnitude,
-			"is_dead": is_deadzone,
+			"is_dead": _inside_deadzone,
 			"o": final_result,
 		}))
 
@@ -316,10 +698,10 @@ func _on_released(last_point: Vector2, last_elapsed: float) -> void:
 	_touch_index = -1;
 	_expected_outer_position = _outer_origin_position;
 	_expected_inner_position = _inner_origin_position;
-	_expected_outer_color = _base_color * _bg_normal_tint;
-	_expected_inner_color = _base_color * _inner_normal_tint;
+	_expected_outer_color = _base_color * _normal_bg_tint;
+	_expected_inner_color = _base_color * _normal_handle_tint;
 	# Call events.
-	if last_elapsed < _tap_cancel_threshold:
+	if last_elapsed < cancel_tap_trigger_threshold:
 		if control_target_node != null:
 			if control_target_node.has_method(_on_tap_method_name):
 				control_target_node.call(_on_tap_method_name, last_point);
@@ -362,48 +744,6 @@ func _on_display_update() -> void:
 	_outer_joystick.self_modulate = _expected_outer_color;
 	_inner_joystick.self_modulate = _expected_inner_color;
 
-#region Property Drawer
-func _get_property_list() -> Array[Dictionary]:
-	var r: Array[Dictionary] = [{
-		"name": &"_mode",
-		"type": TYPE_STRING_NAME,
-		"hint": PROPERTY_HINT_ENUM,
-		"hint_string": "%s,%s,%s" % [MSTC, MDMC, MFLW],
-		"usage": PROPERTY_USAGE_DEFAULT,
-	}];
-	if _mode == MSTC:
-		r.append({
-			"name": &"_out_static_size_trigger",
-			"type": TYPE_VECTOR2,
-			"hint": PROPERTY_HINT_NONE,
-			"usage": PROPERTY_USAGE_DEFAULT,
-		});
-	if _mode == MFLW:
-		r.append({
-			"name": &"_out_follow_radius_tolerance",
-			"type": TYPE_FLOAT,
-			"hint": PROPERTY_HINT_NONE,
-			"usage": PROPERTY_USAGE_DEFAULT,
-		});
-	return r;
-
-func _property_can_revert(property: StringName) -> bool:
-	match property:
-		&"_mode":
-			if _mode == MDMC: return false;
-			return true;
-		&"_out_follow_radius_tolerance":
-			if _out_follow_radius_tolerance == 10.0: return false;
-			return true;
-		_: return false;
-
-func _property_get_revert(property: StringName) -> Variant:
-	match property:
-		&"_mode": return MDMC;
-		&"_out_follow_radius_tolerance": return 10.0;
-		_: return null;
-#endregion
-
 func set_joystick_mode(mode: String) -> void:
 	_mode = mode;
 
@@ -417,45 +757,67 @@ func get_base_color() -> Color:
 	return _base_color;
 
 func set_disabled(disable: bool) -> void:
-	_disabled = disable;
-	if _disabled:
-		_expected_outer_color = _base_color * _bg_disabled_tint;
-		_expected_inner_color = _base_color * _inner_disabled_int;
+	joystick_disabled = disable;
+	if joystick_disabled:
+		_expected_outer_color = _base_color * _disabled_bg_tint;
+		_expected_inner_color = _base_color * _disabled_handle_tint;
 	else:
-		_expected_outer_color = _base_color * _bg_normal_tint;
-		_expected_inner_color = _base_color * _inner_normal_tint;
-	if _disabled && _is_pressed:
+		_expected_outer_color = _base_color * _normal_bg_tint;
+		_expected_inner_color = _base_color * _normal_handle_tint;
+	if joystick_disabled && _is_pressed:
 		_unix_time = Time.get_unix_time_from_system();
 		_on_released(_touch_position_cache, _unix_time);
 	_on_display_update();
 
-func get_disabled() -> bool:
-	return _disabled;
+func is_disabled() -> bool:
+	return joystick_disabled;
 	
 func set_enabled(enable: bool) -> void:
-	_disabled = !enable;
-	if _disabled:
-		_expected_outer_color = _base_color * _bg_disabled_tint;
-		_expected_inner_color = _base_color * _inner_disabled_int;
+	joystick_disabled = !enable;
+	if joystick_disabled:
+		_expected_outer_color = _base_color * _disabled_bg_tint;
+		_expected_inner_color = _base_color * _disabled_handle_tint;
 	else:
-		_expected_outer_color = _base_color * _bg_normal_tint;
-		_expected_inner_color = _base_color * _inner_normal_tint;
-	if _disabled && _is_pressed:
+		_expected_outer_color = _base_color * _normal_bg_tint;
+		_expected_inner_color = _base_color * _normal_handle_tint;
+	if joystick_disabled && _is_pressed:
 		_unix_time = Time.get_unix_time_from_system();
 		_on_released(_touch_position_cache, _unix_time);
 	_on_display_update();
 
-func get_enabled() -> bool:
-	return !_disabled;
+func is_enabled() -> bool:
+	return !joystick_disabled;
+
+## Setting deadzone percentage between 0 and 1.
+func set_deadzone(percentage: float) -> void:
+	if percentage < 0.0: percentage = 0.0;
+	elif percentage > 1.0: percentage = 1.0;
+	deadzone_radius_percentage = percentage;
+
+## Returns percentage of max drag radius.
+func get_deadzone() -> float:
+	return deadzone_radius_percentage;
+
+func set_normalize_output(norm: bool) -> void:
+	normalize_output = norm;
+
+func get_normalize_output() -> bool:
+	return normalize_output;
+
+func set_inverse_output(inverse: bool) -> void:
+	inverse_output = inverse;
+
+func get_inverse_output() -> bool:
+	return inverse_output;
+
+func set_enable_tap_trigger(active: bool) -> void:
+	enable_tap_trigger = active;
+
+func get_enable_tap_trigger() -> bool:
+	return enable_tap_trigger;
 
 func set_control_target_node(t: Node) -> void:
 	control_target_node = t;
 
 func get_control_target_node() -> Node:
 	return control_target_node;
-
-# TODO: Export with conditions.
-#func _get_property_list() -> Array[Dictionary]:
-	#if !Engine.is_editor_hint():
-		#var ret;
-		#return ret;

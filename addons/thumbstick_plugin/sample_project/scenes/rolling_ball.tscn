@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://q0x01vveiohx"]
+
+[ext_resource type="PackedScene" uid="uid://bc15gesn8lubs" path="res://addons/thumbstick_plugin/plugin/joysticks/simple_joystick.tscn" id="1_fkqti"]
+
+[node name="Rolling Ball Game" type="Node"]
+
+[node name="Controller Canvas" type="CanvasLayer" parent="."]
+
+[node name="Movement Joystick" parent="Controller Canvas" instance=ExtResource("1_fkqti")]
+anchors_preset = -1
+anchor_top = 0.5
+anchor_right = 0.45
+_mode = "Dynamic"

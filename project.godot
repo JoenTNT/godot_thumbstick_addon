@@ -13,7 +13,7 @@ config_version=5
 config/name="Thumbstick Plugin"
 config/description="A Single Scripted Virtual Joystick on your Gameplay Screen. All you need to do is to Drag and Drop to your Control UI and Assign Target Controller."
 config/version="0.1"
-run/main_scene="res://addons/thumbstick_plugin/plugin/tutorial_n_explainations.tscn"
+run/main_scene="res://addons/thumbstick_plugin/plugin/testing.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://icon.svg"
 
