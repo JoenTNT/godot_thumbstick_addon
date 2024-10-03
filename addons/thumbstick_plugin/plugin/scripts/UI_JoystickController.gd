@@ -691,7 +691,7 @@ func _draw() -> void:
 	if _is_pressed:
 		_gizmos_color = Color.BLUE;
 		_gizmos_color.a = 0.7;
-		draw_circle(_touch_position_cache, 10.0, _gizmos_color);
+		draw_circle(_touch_position_cache - global_position, 10.0, _gizmos_color);
 	# Coloring Trigger Threshold.
 	if _is_pressed && !_is_triggered:
 		_gizmos_color = Color.PURPLE;

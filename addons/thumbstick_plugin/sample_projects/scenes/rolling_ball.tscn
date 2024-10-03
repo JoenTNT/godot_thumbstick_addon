@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://q0x01vveiohx"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_project/scripts/SAMPLE_PlayerBall3DControl.gd" id="1_7uvqn"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PlayerBall3DControl.gd" id="1_7uvqn"]
 [ext_resource type="PackedScene" uid="uid://bc15gesn8lubs" path="res://addons/thumbstick_plugin/plugin/joysticks/normal_joystick.tscn" id="1_fkqti"]
 
 [sub_resource type="Environment" id="Environment_6iyyn"]

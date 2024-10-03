@@ -2,25 +2,25 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c1mcwfteyrsiy"
-path="res://.godot/imported/outer_background.png-51a06f967615cc05e4ad420b7fd6207c.ctex"
+uid="uid://c30cvy5xlx0wy"
+path="res://.godot/imported/one_way_outer_v.png-60c5dc72413faa4d56f07c72ad38fddb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/thumbstick_plugin/plugin/sample_assets/outer_background.png"
-dest_files=["res://.godot/imported/outer_background.png-51a06f967615cc05e4ad420b7fd6207c.ctex"]
+source_file="res://addons/thumbstick_plugin/plugin/builtin_assets/one_way_outer_v.png"
+dest_files=["res://.godot/imported/one_way_outer_v.png-60c5dc72413faa4d56f07c72ad38fddb.ctex"]
 
 [params]
 
-compress/mode=1
+compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=0.45
+compress/lossy_quality=0.7
 compress/hdr_compression=1
 compress/normal_map=0
-compress/channel_pack=1
+compress/channel_pack=0
 mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0

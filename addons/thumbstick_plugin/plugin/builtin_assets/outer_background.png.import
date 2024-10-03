@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dd75abhooyi32"
-path="res://.godot/imported/inner_control.png-96ef6d4d2b47e9952164ad82f519716a.ctex"
+uid="uid://c1mcwfteyrsiy"
+path="res://.godot/imported/outer_background.png-2c6fb7e6468f6f786ab87a6b6eee1dd4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/thumbstick_plugin/plugin/sample_assets/inner_control.png"
-dest_files=["res://.godot/imported/inner_control.png-96ef6d4d2b47e9952164ad82f519716a.ctex"]
+source_file="res://addons/thumbstick_plugin/plugin/builtin_assets/outer_background.png"
+dest_files=["res://.godot/imported/outer_background.png-2c6fb7e6468f6f786ab87a6b6eee1dd4.ctex"]
 
 [params]
 
