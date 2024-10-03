@@ -153,9 +153,9 @@ var _debug_mode: bool = false:
 ## Visualization control hint in scene for development purpose.
 var _visualize_gizmos: bool = true;
 ## Open subgroup of statistic in Inspector when the game is running.
-var _simulate_editor_testing: bool = false:
+var _show_testing_info: bool = false:
 	set(p_debug):
-		_simulate_editor_testing = p_debug;
+		_show_testing_info = p_debug;
 		notify_property_list_changed();
 ## Notice developer for editor only warnings.
 var _editor_warnings: bool = true;
@@ -166,22 +166,31 @@ var _editor_warnings: bool = true;
 @onready var _inner_joystick: TextureRect = $"Outer BG/Inner CTRL";
 @onready var _outer_origin_position: Vector2 = $"Outer BG".get_screen_position();
 @onready var _inner_origin_position: Vector2 = $"Outer BG/Inner CTRL".get_screen_position();
+
+var _touch_index: int = -1;
+var _touch_pressed_position: Vector2 = Vector2.ZERO;
 var _touch_position_cache: Vector2 = Vector2.ZERO;
-var _start_press_position: Vector2 = Vector2.ZERO;
-var _drag_position: Vector2 = Vector2.ZERO;
-var _elapsed_time_started: float = 0.0;
 var _trigger_direction: Vector2 = Vector2.ZERO;
 var _trigger_magnitude: float = 0.0;
-var _touch_index: int = -1;
-var _is_pressed: bool = false;
-var _is_triggered: bool = false;
-var _running_in_editor: bool = false;
-var _unix_time: float = 0.0;
+var _outer_half_size: Vector2 = Vector2.ZERO;
+var _inner_half_size: Vector2 = Vector2.ZERO;
+
 var _expected_outer_position: Vector2 = Vector2.ZERO;
 var _expected_inner_position: Vector2 = Vector2.ZERO;
 var _expected_outer_color: Color = Color.BLACK;
 var _expected_inner_color: Color = Color.BLACK;
+
+var _elapsed_time_started: float = 0.0;
+var _control_elapsed_time: float = 0.0;
+var _unix_time_now: float = 0.0;
+
 var _inside_deadzone: bool = false;
+var _is_pressed: bool = false;
+var _is_triggered: bool = false;
+
+# Runtime debug variable data.
+var _running_in_editor: bool = false;
+var _gizmos_color: Color = Color.BLACK;
 
 #region Property Drawer
 func _get_property_list() -> Array[Dictionary]:
@@ -322,7 +331,7 @@ func _get_property_list() -> Array[Dictionary]:
 		"usage": PROPERTY_USAGE_GROUP,
 	}, {
 		"name": &"control_target_node",
-		"type": TYPE_NODE_PATH,
+		"type": TYPE_OBJECT,
 		"hint": PROPERTY_HINT_NODE_TYPE,
 		"usage": PROPERTY_USAGE_DEFAULT,
 	}, {
@@ -361,7 +370,7 @@ func _get_property_list() -> Array[Dictionary]:
 			"type": TYPE_BOOL,
 			"usage": PROPERTY_USAGE_DEFAULT,
 		}, {
-			"name": &"_simulate_editor_testing",
+			"name": &"_show_testing_info",
 			"type": TYPE_BOOL,
 			"usage": PROPERTY_USAGE_DEFAULT,
 		}]);
@@ -374,12 +383,76 @@ func _get_property_list() -> Array[Dictionary]:
 		"type": TYPE_BOOL,
 		"usage": PROPERTY_USAGE_DEFAULT,
 	}]);
-	if _simulate_editor_testing:
+	if _show_testing_info:
 		# TODO: Draw cached informations in inspector.
 		r.append_array([{
-			"name": "Simulation Statistic (COMING SOON)",
+			"name": "Simulation Statistic",
 			"type": TYPE_STRING_NAME,
 			"usage": PROPERTY_USAGE_GROUP,
+		}, {
+			"name": &"_touch_index",
+			"type": TYPE_INT,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_touch_pressed_position",
+			"type": TYPE_VECTOR2,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_touch_position_cache",
+			"type": TYPE_VECTOR2,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_trigger_direction",
+			"type": TYPE_VECTOR2,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_trigger_magnitude",
+			"type": TYPE_FLOAT,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": "Render Info",
+			"type": TYPE_STRING_NAME,
+			"usage": PROPERTY_USAGE_SUBGROUP,
+		}, {
+			"name": &"_expected_outer_position",
+			"type": TYPE_VECTOR2,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_expected_inner_position",
+			"type": TYPE_VECTOR2,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_expected_outer_color",
+			"type": TYPE_COLOR,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_expected_inner_color",
+			"type": TYPE_COLOR,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": "Time Info",
+			"type": TYPE_STRING_NAME,
+			"usage": PROPERTY_USAGE_SUBGROUP,
+		}, {
+			"name": &"_elapsed_time_started",
+			"type": TYPE_FLOAT,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_unix_time_now",
+			"type": TYPE_FLOAT,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": "Status Info",
+			"type": TYPE_STRING_NAME,
+			"usage": PROPERTY_USAGE_SUBGROUP,
+		}, {
+			"name": &"_is_pressed",
+			"type": TYPE_BOOL,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
+		}, {
+			"name": &"_is_trigger(",
+			"type": TYPE_BOOL,
+			"usage": PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_READ_ONLY,
 		}, {
 			"name": &"_inside_deadzone",
 			"type": TYPE_BOOL,
@@ -402,7 +475,7 @@ func _property_can_revert(property: StringName) -> bool:
 		&"start_elapsed_on_trigger": return start_elapsed_on_trigger;
 		&"normalize_output": return normalize_output;
 		&"inverse_output": return inverse_output;
-		&"enable_tap_trigger": return enable_tap_trigger;
+		&"enable_tap_trigger": return !enable_tap_trigger;
 		&"joystick_disabled": return joystick_disabled;
 		&"follow_radius_tolerance":
 			return follow_radius_tolerance != DEFAULT_FOLLOW_RADIUS_TOLERANCE;
@@ -438,7 +511,7 @@ func _property_can_revert(property: StringName) -> bool:
 		&"_debug_mode": return _debug_mode;
 		&"_editor_warnings": return !_editor_warnings;
 		&"_visualize_gizmos": return !_visualize_gizmos;
-		&"_simulate_editor_testing": return _simulate_editor_testing;
+		&"_show_testing_info": return _show_testing_info;
 		_: return false;
 
 func _property_get_revert(property: StringName) -> Variant:
@@ -453,7 +526,7 @@ func _property_get_revert(property: StringName) -> Variant:
 		&"start_elapsed_on_trigger": return false;
 		&"normalize_output": return false;
 		&"inverse_output": return false;
-		&"enable_tap_trigger": return false;
+		&"enable_tap_trigger": return true;
 		&"joystick_disabled": return false;
 		&"follow_radius_tolerance": return DEFAULT_FOLLOW_RADIUS_TOLERANCE;
 		&"extend_static_area_trigger": return DEFAULT_EXTEND_STATIC_AREA_TRIGGER;
@@ -474,7 +547,7 @@ func _property_get_revert(property: StringName) -> Variant:
 		&"_debug_mode": return false;
 		&"_editor_warnings": return true;
 		&"_visualize_gizmos": return true;
-		&"_simulate_editor_testing": return false;
+		&"_show_testing_info": return false;
 		_: return null;
 
 # TODO: Editor runtime update buttons in inspector.
@@ -502,6 +575,7 @@ func _ready() -> void:
 		print_rich("[color=FDD303]Warning: \"Project Settings -> Pointing" +
 			"-> emulate_touch_from_mouse\" must be checked.");
 	if _running_in_editor: return;
+	_inside_deadzone = true;
 	_expected_inner_position = _inner_origin_position;
 	_expected_outer_position = _outer_origin_position;
 	set_disabled(joystick_disabled);
@@ -517,133 +591,206 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	_running_in_editor = Engine.is_editor_hint();
 	if !_running_in_editor: return;
-	queue_redraw();
 	# Handle Color Preview.
 	if joystick_disabled:
-		_outer_joystick.self_modulate = _disabled_bg_tint;
-		_inner_joystick.self_modulate = _disabled_handle_tint;
+		_outer_joystick.self_modulate = _base_color * _disabled_bg_tint;
+		_inner_joystick.self_modulate = _base_color * _disabled_handle_tint;
 	elif _visibility_mode == VTCS:
-		_outer_joystick.self_modulate = _transparent_bg_tint;
-		_inner_joystick.self_modulate = _transparent_handle_tint;
+		_outer_joystick.self_modulate = _base_color * _transparent_bg_tint;
+		_inner_joystick.self_modulate = _base_color * _transparent_handle_tint;
 	else:
-		_outer_joystick.self_modulate = _normal_bg_tint;
-		_inner_joystick.self_modulate = _normal_handle_tint;
+		_outer_joystick.self_modulate = _base_color * _normal_bg_tint;
+		_inner_joystick.self_modulate = _base_color * _normal_handle_tint;
+	queue_redraw();
 
 func _draw() -> void:
 	if !_debug_mode || !_visualize_gizmos: return;
-	var temp_color: Color;
 	if _outer_joystick == null: _outer_joystick = $"Outer BG";
-	var outer_half: Vector2 = _outer_joystick.size / 2.0;
+	_outer_half_size = _outer_joystick.size / 2.0;
 	if _inner_joystick == null: _inner_joystick = $"Outer BG/Inner CTRL";
-	var inner_half: Vector2 = _inner_joystick.size / 2.0;
+	_inner_half_size = _inner_joystick.size / 2.0;
 	var touch_area_pos: Vector2 = Vector2(0.0, 0.0);
-	var mid_joystick_pos: Vector2 = _outer_joystick.position + outer_half;
-	var radius_hint: float = inner_half.x + max_drag_radius;
+	var mid_joystick_pos: Vector2 = _outer_joystick.position + _outer_half_size;
+	var radius_hint: float = _inner_half_size.x + max_drag_radius;
+	# Coloring follow extend area.
 	if _mode == MFLW:
-		temp_color = Color.ORANGE;
-		temp_color.a = 0.4;
-		draw_circle(mid_joystick_pos, radius_hint + follow_radius_tolerance, temp_color);
+		_gizmos_color = Color.VIOLET;
+		_gizmos_color.a = 0.5;
+		draw_circle(mid_joystick_pos, radius_hint + follow_radius_tolerance, _gizmos_color);
 	# Coloring Max Pull Radius.
-	temp_color = Color.GREEN;
-	temp_color.a = 0.3;
-	draw_circle(mid_joystick_pos, radius_hint, temp_color);
-	var dead_zone_radius = inner_half.x + max_drag_radius * deadzone_radius_percentage;
-	temp_color = Color.RED;
-	temp_color.a = 0.7;
-	draw_circle(mid_joystick_pos, dead_zone_radius, temp_color);
-	temp_color = Color.AQUAMARINE;
-	temp_color.a = 0.15;
+	if _inside_deadzone:
+		_gizmos_color = Color.YELLOW;
+		_gizmos_color.a = 0.3;
+		draw_circle(mid_joystick_pos, radius_hint, _gizmos_color);
+		var dead_zone_radius = _inner_half_size.x + max_drag_radius * deadzone_radius_percentage;
+		_gizmos_color = Color.RED;
+		_gizmos_color.a = 0.7;
+		draw_circle(mid_joystick_pos, dead_zone_radius, _gizmos_color);
+	else:
+		_gizmos_color = Color.GREEN;
+		_gizmos_color.a = 0.3;
+		draw_circle(mid_joystick_pos, radius_hint, _gizmos_color);
+		var dead_zone_radius = _inner_half_size.x + max_drag_radius * deadzone_radius_percentage;
+		_gizmos_color = Color.YELLOW;
+		_gizmos_color.a = 0.7;
+		draw_circle(mid_joystick_pos, dead_zone_radius, _gizmos_color);
+	# Coloring touchable area.
+	_gizmos_color = Color.AQUAMARINE;
+	_gizmos_color.a = 0.15;
 	if _mode == MDMC || _mode == MFLW:
-		draw_rect(Rect2(touch_area_pos, size), temp_color);
+		draw_rect(Rect2(touch_area_pos, size), _gizmos_color);
 	var static_extra_pos: Vector2 = Vector2.ZERO;
 	if _mode == MSTC:
 		var static_trigger_half: Vector2 = extend_static_area_trigger / 2.0;
 		static_extra_pos = _outer_joystick.position - static_trigger_half;
 		var static_extra_size: Vector2 = _outer_joystick.size + extend_static_area_trigger;
-		draw_rect(Rect2(static_extra_pos, static_extra_size), temp_color);
-	temp_color = Color.YELLOW;
-	temp_color.a = 0.65;
+		draw_rect(Rect2(static_extra_pos, static_extra_size), _gizmos_color);
+	_gizmos_color = Color.BLACK;
+	_gizmos_color.a = 0.65;
 	touch_area_pos += Vector2(4.0, 16.0);
 	if _mode == MDMC || _mode == MFLW:
 		draw_string(ThemeDB.fallback_font, touch_area_pos,
 			"Dynamic Trigger Area" if _mode == MDMC else "Dynamic Follow Trigger Area",
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 16, temp_color);
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 16, _gizmos_color);
 	elif _mode == MSTC:
 		static_extra_pos += Vector2(4.0, -4.0);
 		draw_string(ThemeDB.fallback_font, static_extra_pos, "Static Trigger Area",
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 12, temp_color);
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 12, _gizmos_color);
+	# Draw status informations.
+	var bottom_outer: Vector2 = _outer_joystick.position + Vector2(0.0, _outer_joystick.size.y);
+	bottom_outer += Vector2(-max_drag_radius + 8.0, max_drag_radius - 28.0);
+	draw_string(ThemeDB.fallback_font, bottom_outer,
+		"Triggered: %s" % ("True" if _is_triggered else "False"),
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_color);
+	if _is_triggered:
+		bottom_outer += Vector2(0.0, 14.0);
+		draw_string(ThemeDB.fallback_font, bottom_outer,
+			"Deadzone: %s" % ("True" if _inside_deadzone else "False"),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_color);
+		bottom_outer += Vector2(0.0, 14.0);
+		draw_string(ThemeDB.fallback_font, bottom_outer,
+			"Direction: {dir}".format({"dir": _trigger_direction.normalized()}),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_color);
+		bottom_outer += Vector2(0.0, 14.0);
+		draw_string(ThemeDB.fallback_font, bottom_outer,
+			"Output: {v}".format({"v": _trigger_direction.length() / max_drag_radius}),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_color);
+	else:
+		bottom_outer += Vector2(0.0, 14.0);
+		draw_string(ThemeDB.fallback_font, bottom_outer,
+			"Going to Trigger: {v}/{t}".format({
+				"v": _trigger_direction.length(),
+				"t": start_trigger_threshold,
+			}),
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_color);
+	# Tell elapsed time.
+	bottom_outer += Vector2(0.0, 14.0);
+	draw_string(ThemeDB.fallback_font, bottom_outer,
+		"Latest Elapsed Time: %.2f" % _control_elapsed_time,
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_color);
+	if _is_pressed:
+		_gizmos_color = Color.BLUE;
+		_gizmos_color.a = 0.7;
+		draw_circle(_touch_position_cache, 10.0, _gizmos_color);
+	# Coloring Trigger Threshold.
+	if _is_pressed && !_is_triggered:
+		_gizmos_color = Color.PURPLE;
+		_gizmos_color.a = 0.75;
+		radius_hint = _inner_half_size.x + start_trigger_threshold;
+		draw_circle(mid_joystick_pos, radius_hint, _gizmos_color);
 
 func _input(event: InputEvent) -> void:
 	_running_in_editor = Engine.is_editor_hint();
 	if _running_in_editor: return;
 	if joystick_disabled: return;
-	_unix_time = Time.get_unix_time_from_system();
+	_unix_time_now = Time.get_unix_time_from_system();
 	if event is InputEventScreenTouch:
-		_input_screen_touch(event as InputEventScreenTouch, _unix_time);
+		_input_screen_touch(event as InputEventScreenTouch, _unix_time_now);
 	elif event is InputEventScreenDrag:
-		_input_screen_drag(event as InputEventScreenDrag, _unix_time);
+		_input_screen_drag(event as InputEventScreenDrag, _unix_time_now);
 	_on_display_update();
-	if !_debug_mode: return;
+	if !_debug_mode || !_gizmos_color: return;
 	queue_redraw();
 
 func _input_screen_touch(e: InputEventScreenTouch, t: float) -> void:
 	_touch_position_cache = e.position;
+	_inside_deadzone = true;
 	if e.pressed && _is_point_inside_area(_touch_position_cache):
 		if _is_pressed: return;
 		_touch_index = e.index;
+		_touch_pressed_position = _touch_position_cache;
+		_control_elapsed_time = 0.0;
 		_on_pressed(_touch_position_cache, t);
 	if not e.pressed:
 		if !_is_pressed || _touch_index != e.index: return;
-		_on_released(_touch_position_cache, t - _elapsed_time_started);
+		_control_elapsed_time = t - _elapsed_time_started;
+		_on_released(_touch_position_cache, _control_elapsed_time);
 
 func _input_screen_drag(e: InputEventScreenDrag, t: float) -> void:
 	if !_is_pressed: return;
 	if e.index != _touch_index: return;
-	_drag_position = e.position;
+	_touch_position_cache = e.position;
+	_control_elapsed_time = t - _elapsed_time_started;
 	if _is_triggered:
-		_on_trigger(_drag_position, t - _elapsed_time_started);
+		_on_trigger(_touch_position_cache, _control_elapsed_time);
 		return;
-	if !_is_trigger(_start_press_position, _drag_position, start_trigger_threshold):
-		_on_before_trigger(_drag_position, t - _elapsed_time_started);
+	if !_is_trigger(_touch_pressed_position, _touch_position_cache, start_trigger_threshold):
+		if start_elapsed_on_trigger: _control_elapsed_time = 0.0;
+		_on_before_trigger(_touch_position_cache, _control_elapsed_time);
 		return;
 	if start_elapsed_on_trigger: _elapsed_time_started = t;
 	_is_triggered = true;
 
 func _on_pressed(start_point: Vector2, start_t: float) -> void:
-	_start_press_position = start_point;
 	if !start_elapsed_on_trigger: _elapsed_time_started = start_t;
 	# Calculate input, setting status, and predict display update.
-	var outer_half: Vector2 = _outer_joystick.size / 2.0;
+	_outer_half_size = _outer_joystick.size / 2.0;
 	match _mode:
 		MSTC:
-			if !_is_point_inside_joystick_outer(_start_press_position): return;
+			if !_is_point_inside_joystick_outer(start_point): return;
 			_is_pressed = true;
-			_start_press_position = _outer_joystick.global_position + outer_half;
+			_touch_pressed_position = _outer_joystick.global_position + _outer_half_size;
 		MDMC, MFLW:
 			_is_pressed = true;
-			_expected_outer_position = _start_press_position - outer_half;
-			_expected_inner_position = _start_press_position - _inner_joystick.size / 2.0;
+			_expected_outer_position = start_point - _outer_half_size;
+			_expected_inner_position = start_point - _inner_joystick.size / 2.0;
 			_expected_outer_color = _base_color * _pressed_bg_tint;
 			_expected_inner_color = _base_color * _pressed_handle_tint;
 	# Call Event
 	if control_target_node != null:
 		if control_target_node.has_method(_on_pressed_method_name):
-			control_target_node.call(_on_pressed_method_name, _start_press_position);
-	on_pressed.emit(_start_press_position);
+			control_target_node.call(_on_pressed_method_name, start_point);
+	on_pressed.emit(_touch_pressed_position);
 
 func _on_before_trigger(pre_point: Vector2, _pre_t: float) -> void:
-	var inner_half: Vector2 = _inner_joystick.size / 2.0;
-	_trigger_direction = pre_point - _start_press_position;
-	_expected_inner_position = _start_press_position + _trigger_direction - inner_half;
+	_inner_half_size = _inner_joystick.size / 2.0;
+	_trigger_direction = pre_point - _touch_pressed_position;
+	match _input_mode:
+		IVCT:
+			_trigger_direction.x = 0.0;
+			_trigger_magnitude = _trigger_direction.length();
+		IHZT:
+			_trigger_direction.y = 0.0;
+			_trigger_magnitude = _trigger_direction.length();
+	_expected_inner_position = _touch_pressed_position + _trigger_direction - _inner_half_size;
 
 func _on_trigger(point: Vector2, elapsed: float):
-	_trigger_direction = point - _start_press_position;
+	_trigger_direction = point - _touch_pressed_position;
 	_trigger_magnitude = _trigger_direction.length();
 	# Calculate input, setting status, and predict display update.
-	var inner_half: Vector2 = _inner_joystick.size / 2.0;
+	_inner_half_size = _inner_joystick.size / 2.0;
 	var normal_dir: Vector2 = _trigger_direction.normalized();
 	var final_result: Vector2;
-	var input_v: float; 
+	var input_v: float;
+	match _input_mode:
+		IVCT:
+			_trigger_direction.x = 0.0;
+			_trigger_magnitude = _trigger_direction.length();
+			normal_dir = _trigger_direction.normalized();
+		IHZT:
+			_trigger_direction.y = 0.0;
+			_trigger_magnitude = _trigger_direction.length();
+			normal_dir = _trigger_direction.normalized();
 	match _mode:
 		MDMC, MSTC:
 			if _trigger_magnitude > max_drag_radius:
@@ -651,7 +798,7 @@ func _on_trigger(point: Vector2, elapsed: float):
 				_trigger_magnitude = _trigger_direction.length();
 			input_v = _trigger_magnitude / max_drag_radius;
 			_inside_deadzone = input_v <= deadzone_radius_percentage;
-			_expected_inner_position = _start_press_position + _trigger_direction - inner_half;
+			_expected_inner_position = _touch_pressed_position + _trigger_direction - _inner_half_size;
 			if _inside_deadzone:
 				_trigger_direction = Vector2(0.0, 0.0);
 				_trigger_magnitude = 0.0;
@@ -660,16 +807,16 @@ func _on_trigger(point: Vector2, elapsed: float):
 			final_result = (-1 if inverse_output else 1) * normal_dir * input_v;
 		MFLW:
 			var move_outer_rad: float = 0.0;
-			var out_tol: float = max_drag_radius + follow_radius_tolerance;
+			var out_tol: float = max_drag_radius + follow_radius_tolerance + _inner_half_size.x;
 			if _trigger_magnitude > out_tol:
 				move_outer_rad = _trigger_magnitude - out_tol;
 			if _trigger_magnitude > max_drag_radius:
 				_trigger_direction = normal_dir * max_drag_radius;
 				_trigger_magnitude = _trigger_direction.length();
 			var outer_half: Vector2 = _outer_joystick.size / 2.0;
-			_start_press_position += normal_dir * move_outer_rad;
-			_expected_outer_position = _start_press_position - outer_half;
-			_expected_inner_position = _start_press_position + _trigger_direction - inner_half;
+			_touch_pressed_position += normal_dir * move_outer_rad;
+			_expected_outer_position = _touch_pressed_position - outer_half;
+			_expected_inner_position = _touch_pressed_position + _trigger_direction - _inner_half_size;
 			input_v = _trigger_magnitude / max_drag_radius;
 			_inside_deadzone = input_v <= deadzone_radius_percentage;
 			if _inside_deadzone:
@@ -683,25 +830,23 @@ func _on_trigger(point: Vector2, elapsed: float):
 		if control_target_node.has_method(_on_trigger_method_name):
 			control_target_node.call(_on_trigger_method_name, final_result, elapsed);
 	on_trigger.emit(final_result, elapsed);
-	if _debug_mode:
-		print("TDir = ({xDir}, {yDir}); M = {mag}; DZ = ({is_dead}); Out = {o}".format({
-			"xDir": "%.f" % _trigger_direction.x,
-			"yDir": "%.f" % _trigger_direction.y,
-			"mag": "%.2f" % _trigger_magnitude,
-			"is_dead": _inside_deadzone,
-			"o": final_result,
-		}))
 
 func _on_released(last_point: Vector2, last_elapsed: float) -> void:
 	_is_pressed = false;
 	_is_triggered = false;
 	_touch_index = -1;
+	_trigger_direction = Vector2.ZERO;
+	_trigger_magnitude = 0.0;
 	_expected_outer_position = _outer_origin_position;
 	_expected_inner_position = _inner_origin_position;
-	_expected_outer_color = _base_color * _normal_bg_tint;
-	_expected_inner_color = _base_color * _normal_handle_tint;
+	if _visibility_mode == VTCS:
+		_expected_outer_color = _base_color * _transparent_bg_tint;
+		_expected_inner_color = _base_color * _transparent_handle_tint;
+	else:
+		_expected_outer_color = _base_color * _normal_bg_tint;
+		_expected_inner_color = _base_color * _normal_handle_tint;
 	# Call events.
-	if last_elapsed < cancel_tap_trigger_threshold:
+	if enable_tap_trigger && last_elapsed < cancel_tap_trigger_threshold:
 		if control_target_node != null:
 			if control_target_node.has_method(_on_tap_method_name):
 				control_target_node.call(_on_tap_method_name, last_point);
@@ -719,9 +864,10 @@ func _is_point_inside_area(point: Vector2) -> bool:
 		point.y >= gs.y && point.y <= gs.y + (sz.y * cs.y));
 
 func _is_point_inside_joystick_outer(point: Vector2) -> bool:
+	var half_extend: Vector2 = extend_static_area_trigger / 2.0;
 	var cos: Vector2 = _outer_joystick.get_global_transform_with_canvas().get_scale();
-	var gs: Vector2 = _outer_joystick.global_position;
-	var sz: Vector2 = _outer_joystick.size;
+	var gs: Vector2 = _outer_joystick.global_position - half_extend;
+	var sz: Vector2 = _outer_joystick.size + extend_static_area_trigger;
 	return (point.x >= gs.x && point.x <= gs.x + (sz.x * cos.x)) && (
 		point.y >= gs.y && point.y <= gs.y + (sz.y * cos.y));
 
@@ -730,9 +876,9 @@ func _is_trigger(a: Vector2, b: Vector2, t: float) -> bool:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED:
-		_unix_time = Time.get_unix_time_from_system();
+		_unix_time_now = Time.get_unix_time_from_system();
 		if !visible && _is_pressed:
-			_on_released(_touch_position_cache, _unix_time);
+			_on_released(_touch_position_cache, _unix_time_now);
 
 func _on_viewport_size_changed() -> void:
 	_outer_joystick.global_position = _outer_origin_position;
@@ -744,29 +890,20 @@ func _on_display_update() -> void:
 	_outer_joystick.self_modulate = _expected_outer_color;
 	_inner_joystick.self_modulate = _expected_inner_color;
 
-func set_joystick_mode(mode: String) -> void:
-	_mode = mode;
-
-func get_joystick_mode() -> String:
-	return _mode;
-
-func set_base_color(c: Color) -> void:
-	_base_color = c;
-
-func get_base_color() -> Color:
-	return _base_color;
-
 func set_disabled(disable: bool) -> void:
 	joystick_disabled = disable;
 	if joystick_disabled:
 		_expected_outer_color = _base_color * _disabled_bg_tint;
 		_expected_inner_color = _base_color * _disabled_handle_tint;
+	elif _visibility_mode == VTCS:
+		_expected_outer_color = _base_color * _transparent_bg_tint;
+		_expected_inner_color = _base_color * _transparent_handle_tint;
 	else:
 		_expected_outer_color = _base_color * _normal_bg_tint;
 		_expected_inner_color = _base_color * _normal_handle_tint;
 	if joystick_disabled && _is_pressed:
-		_unix_time = Time.get_unix_time_from_system();
-		_on_released(_touch_position_cache, _unix_time);
+		_unix_time_now = Time.get_unix_time_from_system();
+		_on_released(_touch_position_cache, _unix_time_now);
 	_on_display_update();
 
 func is_disabled() -> bool:
@@ -781,8 +918,8 @@ func set_enabled(enable: bool) -> void:
 		_expected_outer_color = _base_color * _normal_bg_tint;
 		_expected_inner_color = _base_color * _normal_handle_tint;
 	if joystick_disabled && _is_pressed:
-		_unix_time = Time.get_unix_time_from_system();
-		_on_released(_touch_position_cache, _unix_time);
+		_unix_time_now = Time.get_unix_time_from_system();
+		_on_released(_touch_position_cache, _unix_time_now);
 	_on_display_update();
 
 func is_enabled() -> bool:
@@ -815,6 +952,31 @@ func set_enable_tap_trigger(active: bool) -> void:
 
 func get_enable_tap_trigger() -> bool:
 	return enable_tap_trigger;
+
+func set_joystick_mode(mode: String) -> void:
+	_mode = mode;
+
+func get_joystick_mode() -> String:
+	return _mode;
+
+func set_base_color(c: Color) -> void:
+	_base_color = c;
+	if joystick_disabled:
+		_expected_outer_color = _base_color * _disabled_bg_tint;
+		_expected_inner_color = _base_color * _disabled_handle_tint;
+	elif _visibility_mode == VTCS && !_is_pressed:
+		_expected_outer_color = _base_color * _transparent_bg_tint;
+		_expected_inner_color = _base_color * _transparent_handle_tint;
+	elif _is_pressed:
+		_expected_outer_color = _base_color * _pressed_bg_tint;
+		_expected_inner_color = _base_color * _pressed_handle_tint;
+	else: # Normal
+		_expected_outer_color = _base_color * _normal_bg_tint;
+		_expected_inner_color = _base_color * _normal_handle_tint;
+	_on_display_update();
+
+func get_base_color() -> Color:
+	return _base_color;
 
 func set_control_target_node(t: Node) -> void:
 	control_target_node = t;

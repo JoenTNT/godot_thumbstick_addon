@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3 uid="uid://6cdpyhwscyxl"]
+
+[ext_resource type="Theme" uid="uid://ckoenjphd51gp" path="res://addons/thumbstick_plugin/sample_project/assets/tsp_theme.tres" id="1_apjfl"]
+[ext_resource type="PackedScene" uid="uid://bc15gesn8lubs" path="res://addons/thumbstick_plugin/plugin/joysticks/normal_joystick.tscn" id="1_uxdah"]
+
+[node name="Raining Gold Game" type="Node"]
+
+[node name="Main Canvas" type="CanvasLayer" parent="."]
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Main Canvas"]
+anchors_preset = -1
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 272.0
+offset_bottom = 64.0
+theme = ExtResource("1_apjfl")
+bbcode_enabled = true
+text = "SCORE: [color=FE6283]00000[/color]"
+fit_content = true
+scroll_active = false
+
+[node name="Controller Canvas" type="CanvasLayer" parent="."]
+
+[node name="Movement Joystick" parent="Controller Canvas" instance=ExtResource("1_uxdah")]
+anchors_preset = -1
+anchor_top = 0.5
+anchor_right = 0.45
+_visibility_mode = "Touchscreen"
+_input_mode = "Horizontal Only"
+joystick_disabled = true
+_transparent_bg_tint = Color(1, 1, 1, 0.35)
+_transparent_handle_tint = Color(1, 1, 1, 0.5)
+_debug_mode = false

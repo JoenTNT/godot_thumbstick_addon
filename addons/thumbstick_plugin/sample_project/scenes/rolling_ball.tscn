@@ -1,13 +1,74 @@
-[gd_scene load_steps=2 format=3 uid="uid://q0x01vveiohx"]
+[gd_scene load_steps=10 format=3 uid="uid://q0x01vveiohx"]
 
-[ext_resource type="PackedScene" uid="uid://bc15gesn8lubs" path="res://addons/thumbstick_plugin/plugin/joysticks/simple_joystick.tscn" id="1_fkqti"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_project/scripts/SAMPLE_PlayerBall3DControl.gd" id="1_7uvqn"]
+[ext_resource type="PackedScene" uid="uid://bc15gesn8lubs" path="res://addons/thumbstick_plugin/plugin/joysticks/normal_joystick.tscn" id="1_fkqti"]
+
+[sub_resource type="Environment" id="Environment_6iyyn"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_71vmc"]
+friction = 0.05
+bounce = 0.6
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_qiydh"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_nplx0"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_44tfb"]
+friction = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_2agwl"]
+size = Vector3(20, 0.1, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jg7rp"]
+size = Vector3(20, 0.1, 5)
 
 [node name="Rolling Ball Game" type="Node"]
 
+[node name="World Setup" type="Node" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World Setup"]
+transform = Transform3D(0.708451, -0.59188, -0.384416, 0, -0.544683, 0.838642, -0.70576, -0.594136, -0.385881, 0, 10, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="World Setup"]
+environment = SubResource("Environment_6iyyn")
+
+[node name="Stage" type="Node3D" parent="."]
+
+[node name="Camera Follow" type="Camera3D" parent="Stage"]
+transform = Transform3D(1, 0, 0, 0, 0.366875, 0.93027, 0, -0.93027, 0.366875, 0, 5.95643, 2.87725)
+fov = 90.0
+near = 0.1
+far = 1024.0
+
+[node name="Player" type="RigidBody3D" parent="Stage"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mass = 5.0
+physics_material_override = SubResource("PhysicsMaterial_71vmc")
+script = ExtResource("1_7uvqn")
+
+[node name="Collider" type="CollisionShape3D" parent="Stage/Player"]
+shape = SubResource("SphereShape3D_qiydh")
+
+[node name="Model" type="MeshInstance3D" parent="Stage/Player"]
+mesh = SubResource("SphereMesh_nplx0")
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+physics_material_override = SubResource("PhysicsMaterial_44tfb")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/Floor"]
+mesh = SubResource("BoxMesh_2agwl")
+
+[node name="Collider" type="CollisionShape3D" parent="Environment/Floor"]
+shape = SubResource("BoxShape3D_jg7rp")
+
 [node name="Controller Canvas" type="CanvasLayer" parent="."]
 
-[node name="Movement Joystick" parent="Controller Canvas" instance=ExtResource("1_fkqti")]
+[node name="Movement Joystick" parent="Controller Canvas" node_paths=PackedStringArray("control_target_node") instance=ExtResource("1_fkqti")]
 anchors_preset = -1
 anchor_top = 0.5
 anchor_right = 0.45
-_mode = "Dynamic"
+control_target_node = NodePath("../../Stage/Player")
+_on_trigger_method_name = "_on_trigger"

@@ -1,27 +1,30 @@
-[gd_scene load_steps=4 format=3 uid="uid://bc15gesn8lubs"]
+[gd_scene load_steps=5 format=3 uid="uid://cc2dgjii6ccqn"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/plugin/scripts/UI_JoystickController.gd" id="1_7wsac"]
-[ext_resource type="Texture2D" uid="uid://c1mcwfteyrsiy" path="res://addons/thumbstick_plugin/plugin/sample_assets/outer_background.png" id="2_yne5e"]
-[ext_resource type="Texture2D" uid="uid://dd75abhooyi32" path="res://addons/thumbstick_plugin/plugin/sample_assets/inner_control.png" id="3_bqy3b"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/plugin/scripts/UI_JoystickController.gd" id="1_ufj3m"]
+[ext_resource type="Texture2D" uid="uid://c30cvy5xlx0wy" path="res://addons/thumbstick_plugin/plugin/sample_assets/one_way_outer_v.png" id="2_abryb"]
+[ext_resource type="Texture2D" uid="uid://c1mcwfteyrsiy" path="res://addons/thumbstick_plugin/plugin/sample_assets/outer_background.png" id="3_0a60q"]
+[ext_resource type="Texture2D" uid="uid://dd75abhooyi32" path="res://addons/thumbstick_plugin/plugin/sample_assets/inner_control.png" id="4_hyblk"]
 
-[node name="Simple Joystick" type="Control"]
+[node name="Vertical Joystick" type="Control"]
 layout_mode = 3
-anchors_preset = 15
+anchor_left = 0.667
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_7wsac")
-_mode = "Dynamic"
+script = ExtResource("1_ufj3m")
+_mode = "Static"
 _visibility_mode = "Always"
 _input_mode = "Normal"
+extend_static_area_trigger = Vector2(24, 24)
 max_drag_radius = 64.0
 start_trigger_threshold = 16.0
 deadzone_radius_percentage = 0.2
-start_elapsed_on_trigger = null
-normalize_output = null
-inverse_output = null
-enable_tap_trigger = false
+start_elapsed_on_trigger = true
+normalize_output = false
+inverse_output = false
+enable_tap_trigger = true
+cancel_tap_trigger_threshold = 0.2
 joystick_disabled = false
 _base_color = Color(1, 1, 1, 1)
 _normal_bg_tint = Color(1, 1, 1, 1)
@@ -30,14 +33,13 @@ _pressed_bg_tint = Color(1, 1, 1, 1)
 _pressed_handle_tint = Color(0.745098, 0.745098, 0.745098, 1)
 _disabled_bg_tint = Color(0.6, 0.6, 0.6, 0.4)
 _disabled_handle_tint = Color(0.6, 0.6, 0.6, 0.4)
-control_target_node = null
 _on_trigger_method_name = "on_trigger"
 _on_pressed_method_name = "on_pressed"
 _on_released_method_name = "on_released"
 _on_tap_method_name = "on_tap"
 _debug_mode = true
 _visualize_gizmos = true
-_simulate_editor_testing = false
+_show_testing_info = false
 _editor_warnings = true
 
 [node name="Outer BG" type="TextureRect" parent="."]
@@ -49,7 +51,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_yne5e")
+texture = ExtResource("2_abryb")
 
 [node name="Shadow" type="TextureRect" parent="Outer BG"]
 visible = false
@@ -65,7 +67,7 @@ offset_left = 4.0
 offset_top = 4.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_yne5e")
+texture = ExtResource("3_0a60q")
 
 [node name="Inner CTRL" type="TextureRect" parent="Outer BG"]
 layout_mode = 1
@@ -76,7 +78,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_bqy3b")
+texture = ExtResource("4_hyblk")
 
 [node name="Shadow" type="TextureRect" parent="Outer BG/Inner CTRL"]
 visible = false
@@ -92,4 +94,4 @@ offset_left = 4.0
 offset_top = 4.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_bqy3b")
+texture = ExtResource("4_hyblk")
