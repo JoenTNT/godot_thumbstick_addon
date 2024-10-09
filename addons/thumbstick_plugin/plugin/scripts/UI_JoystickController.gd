@@ -152,6 +152,8 @@ var _debug_mode: bool = false:
 		notify_property_list_changed();
 ## Visualization control hint in scene for development purpose.
 var _visualize_gizmos: bool = true;
+## Recolor text hint with color, useful to prevent camouflage against background.
+var _text_hint_color: Color = Color.BLACK;
 ## Open subgroup of statistic in Inspector when the game is running.
 var _show_testing_info: bool = false:
 	set(p_debug):
@@ -370,6 +372,10 @@ func _get_property_list() -> Array[Dictionary]:
 			"type": TYPE_BOOL,
 			"usage": PROPERTY_USAGE_DEFAULT,
 		}, {
+			"name": &"_text_hint_color",
+			"type": TYPE_COLOR,
+			"usage": PROPERTY_USAGE_DEFAULT,
+		}, {
 			"name": &"_show_testing_info",
 			"type": TYPE_BOOL,
 			"usage": PROPERTY_USAGE_DEFAULT,
@@ -511,6 +517,7 @@ func _property_can_revert(property: StringName) -> bool:
 		&"_debug_mode": return _debug_mode;
 		&"_editor_warnings": return !_editor_warnings;
 		&"_visualize_gizmos": return !_visualize_gizmos;
+		&"_text_hint_color": return _text_hint_color != Color.BLACK;
 		&"_show_testing_info": return _show_testing_info;
 		_: return false;
 
@@ -547,6 +554,7 @@ func _property_get_revert(property: StringName) -> Variant:
 		&"_debug_mode": return false;
 		&"_editor_warnings": return true;
 		&"_visualize_gizmos": return true;
+		&"_text_hint_color": return Color.BLACK;
 		&"_show_testing_info": return false;
 		_: return null;
 
@@ -645,7 +653,7 @@ func _draw() -> void:
 		static_extra_pos = _outer_joystick.position - static_trigger_half;
 		var static_extra_size: Vector2 = _outer_joystick.size + extend_static_area_trigger;
 		draw_rect(Rect2(static_extra_pos, static_extra_size), _gizmos_color);
-	_gizmos_color = Color.BLACK;
+	_gizmos_color = _text_hint_color;
 	_gizmos_color.a = 0.65;
 	touch_area_pos += Vector2(4.0, 16.0);
 	if _mode == MDMC || _mode == MFLW:

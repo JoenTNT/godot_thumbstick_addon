@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://c3ujowln1lu63"]
+
+[ext_resource type="Texture2D" uid="uid://d07ryinqxn7ob" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/meteor/meteor2.png" id="1_8hsol"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Meteor2D.gd" id="1_33tdu"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_quu4q"]
+radius = 34.8
+height = 91.55
+
+[node name="Meteor T2" type="Area2D"]
+position = Vector2(392, 152)
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("1_33tdu")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+scale = Vector2(0.206055, 0.206055)
+texture = ExtResource("1_8hsol")
+
+[node name="Collider" type="CollisionShape2D" parent="."]
+position = Vector2(-3.99999, -3)
+rotation = -0.336849
+shape = SubResource("CapsuleShape2D_quu4q")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

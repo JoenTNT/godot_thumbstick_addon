@@ -1,0 +1,306 @@
+[gd_scene load_steps=26 format=3 uid="uid://6cdpyhwscyxl"]
+
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_MeteorSpawner.gd" id="1_2h5cx"]
+[ext_resource type="Texture2D" uid="uid://bbgmeakxmui2" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk3.png" id="1_fyfjd"]
+[ext_resource type="Theme" uid="uid://ckoenjphd51gp" path="res://addons/thumbstick_plugin/sample_projects/assets/tsp_theme.tres" id="1_mqn6o"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Rocket.gd" id="1_t5oqw"]
+[ext_resource type="Texture2D" uid="uid://cimth1txmveon" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/circle_32x32.png" id="1_uk3dp"]
+[ext_resource type="PackedScene" uid="uid://7f1tiihm3jvh" path="res://addons/thumbstick_plugin/plugin/joysticks/horizontal_joystick.tscn" id="2_4gru8"]
+[ext_resource type="Texture2D" uid="uid://t4nvbk3okhid" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk4.png" id="2_f5sm7"]
+[ext_resource type="Texture2D" uid="uid://cvlir1v3xnmc1" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk2.png" id="3_btp4d"]
+[ext_resource type="Texture2D" uid="uid://c0cggf5u2lj0a" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk1.png" id="4_xujaw"]
+[ext_resource type="Texture2D" uid="uid://bierq7t1b7uec" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/rocket.png" id="5_7mq6k"]
+[ext_resource type="PackedScene" uid="uid://nxen3u7u5wgs" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_1.tscn" id="9_0ueyb"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreUpdater.gd" id="10_7i02q"]
+[ext_resource type="PackedScene" uid="uid://c3ujowln1lu63" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_2.tscn" id="10_pjuso"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scenes/SAMPLE_ScoreEmitter.gd" id="11_fc8mw"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Destroyer2D.gd" id="11_kh1pr"]
+
+[sub_resource type="Environment" id="Environment_hwvhw"]
+
+[sub_resource type="Curve" id="Curve_hjlux"]
+_data = [Vector2(0, 0.504837), 0.0, 0.0, 0, 0, Vector2(0.495413, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_7r0nt"]
+curve = SubResource("Curve_hjlux")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1dyk7"]
+lifetime_randomness = 0.1
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(270, 0, 0)
+direction = Vector3(0, 1, 0)
+spread = 0.0
+initial_velocity_min = 98.0
+initial_velocity_max = 144.0
+gravity = Vector3(0, 0, 0)
+linear_accel_min = -2.23517e-06
+linear_accel_max = -2.23517e-06
+radial_accel_min = 0.499998
+radial_accel_max = 0.999998
+tangential_accel_min = -0.100002
+tangential_accel_max = 0.0999978
+attractor_interaction_enabled = false
+scale_min = 0.05
+scale_max = 0.18
+alpha_curve = SubResource("CurveTexture_7r0nt")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vvf22"]
+size = Vector2(432, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_yu6j1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_fyfjd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_f5sm7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_btp4d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_xujaw")
+}],
+"loop": true,
+"name": &"default_thruster",
+"speed": 24.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_fxk7j"]
+radius = 20.15
+height = 144.8
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e73l2"]
+size = Vector2(20, 960)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ltbeu"]
+size = Vector2(500, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5xo4w"]
+size = Vector2(720, 80)
+
+[node name="Rocket Dodger" type="Node"]
+
+[node name="2D World" type="Node" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="2D World"]
+anchor_mode = 0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="2D World"]
+environment = SubResource("Environment_hwvhw")
+
+[node name="Falling Stars" type="GPUParticles2D" parent="2D World"]
+position = Vector2(280, -48)
+amount = 120
+process_material = SubResource("ParticleProcessMaterial_1dyk7")
+texture = ExtResource("1_uk3dp")
+lifetime = 12.0
+preprocess = 8.0
+speed_scale = 2.0
+randomness = 0.1
+fixed_fps = 24
+
+[node name="Meteor Spawner" type="Area2D" parent="2D World"]
+position = Vector2(270, -108)
+script = ExtResource("1_2h5cx")
+meteor_presets = Array[PackedScene]([ExtResource("9_0ueyb"), ExtResource("10_pjuso")])
+
+[node name="Spawn Area" type="CollisionShape2D" parent="2D World/Meteor Spawner"]
+shape = SubResource("RectangleShape2D_vvf22")
+
+[node name="Spawn Timer" type="Timer" parent="2D World/Meteor Spawner"]
+wait_time = 3.2
+autostart = true
+
+[node name="Accelerator Timer" type="Timer" parent="2D World/Meteor Spawner"]
+wait_time = 1.5
+autostart = true
+
+[node name="Rocket" type="RigidBody2D" parent="2D World"]
+position = Vector2(270, 720)
+collision_layer = 2
+mass = 4.0
+gravity_scale = 0.0
+script = ExtResource("1_t5oqw")
+move_speed = 216.0
+
+[node name="Thruster Animation" type="AnimatedSprite2D" parent="2D World/Rocket"]
+position = Vector2(0, 114)
+scale = Vector2(0.25, 0.25)
+sprite_frames = SubResource("SpriteFrames_yu6j1")
+animation = &"default_thruster"
+frame = 1
+frame_progress = 0.43634
+
+[node name="Sprite" type="Sprite2D" parent="2D World/Rocket"]
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("5_7mq6k")
+
+[node name="Collider" type="CollisionShape2D" parent="2D World/Rocket"]
+shape = SubResource("CapsuleShape2D_fxk7j")
+
+[node name="Rightside Bound" type="StaticBody2D" parent="2D World"]
+position = Vector2(540, 0)
+collision_mask = 0
+
+[node name="Collider" type="CollisionShape2D" parent="2D World/Rightside Bound"]
+position = Vector2(10, 480)
+shape = SubResource("RectangleShape2D_e73l2")
+
+[node name="Leftside Bound" type="StaticBody2D" parent="2D World"]
+collision_mask = 0
+
+[node name="Collider" type="CollisionShape2D" parent="2D World/Leftside Bound"]
+position = Vector2(-10, 480)
+shape = SubResource("RectangleShape2D_e73l2")
+
+[node name="Score Emitter" type="Area2D" parent="2D World" node_paths=PackedStringArray("score_display")]
+position = Vector2(270, 900)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("11_fc8mw")
+score_display = NodePath("../../User Interface/Main Canvas/Background/Score Text")
+
+[node name="Collider" type="CollisionShape2D" parent="2D World/Score Emitter"]
+shape = SubResource("RectangleShape2D_ltbeu")
+
+[node name="Destroyer" type="Area2D" parent="2D World" node_paths=PackedStringArray("spawner_container")]
+position = Vector2(280, 1440)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("11_kh1pr")
+spawner_container = NodePath("../Meteor Spawner")
+
+[node name="Collider" type="CollisionShape2D" parent="2D World/Destroyer"]
+shape = SubResource("RectangleShape2D_5xo4w")
+
+[node name="User Interface" type="Node" parent="."]
+
+[node name="Main Canvas" type="CanvasLayer" parent="User Interface"]
+
+[node name="Background" type="ColorRect" parent="User Interface/Main Canvas"]
+self_modulate = Color(0, 0, 0, 0.392157)
+offset_right = 200.0
+offset_bottom = 60.0
+
+[node name="Score Text" type="RichTextLabel" parent="User Interface/Main Canvas/Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.25
+anchor_right = 0.9
+anchor_bottom = 0.75
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_mqn6o")
+bbcode_enabled = true
+text = "SCORE: [color=FE6283]%d[/color]"
+fit_content = true
+scroll_active = false
+script = ExtResource("10_7i02q")
+
+[node name="Controller Canvas" type="CanvasLayer" parent="User Interface"]
+
+[node name="Horizontal Joystick" parent="User Interface/Controller Canvas" instance=ExtResource("2_4gru8")]
+anchors_preset = -1
+anchor_top = 0.725
+grow_vertical = 0
+_mode = "Dynamic"
+_visibility_mode = "Touchscreen"
+_base_color = Color(0.145098, 0.615686, 1, 1)
+_normal_bg_tint = Color(1, 1, 1, 0.156863)
+_normal_handle_tint = Color(1, 1, 1, 0.156863)
+_pressed_bg_tint = Color(1, 1, 1, 0.156863)
+_pressed_handle_tint = Color(0.745098, 0.745098, 0.745098, 0.156863)
+_transparent_bg_tint = Color(1, 1, 1, 0.0392157)
+_transparent_handle_tint = Color(1, 1, 1, 0.0392157)
+_debug_mode = false
+
+[node name="Game Over Canvas" type="CanvasLayer" parent="User Interface"]
+process_mode = 4
+layer = 3
+visible = false
+
+[node name="Background" type="ColorRect" parent="User Interface/Game Over Canvas"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.784314)
+
+[node name="Center Alignment" type="VBoxContainer" parent="User Interface/Game Over Canvas"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Game Over Sign" type="RichTextLabel" parent="User Interface/Game Over Canvas/Center Alignment"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 72
+bbcode_enabled = true
+text = "[center][wave]GAME OVER[/wave][/center]"
+fit_content = true
+scroll_active = false
+
+[node name="EMPTY" type="Control" parent="User Interface/Game Over Canvas/Center Alignment"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="User Interface/Game Over Canvas/Center Alignment"]
+layout_mode = 2
+mouse_filter = 0
+alignment = 1
+
+[node name="Button" type="Button" parent="User Interface/Game Over Canvas/Center Alignment/Buttons"]
+custom_minimum_size = Vector2(80, 24)
+layout_mode = 2
+mouse_filter = 1
+
+[node name="ColorRect" type="ColorRect" parent="User Interface/Game Over Canvas/Center Alignment/Buttons/Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Text" type="RichTextLabel" parent="User Interface/Game Over Canvas/Center Alignment/Buttons/Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+bbcode_enabled = true
+text = "[center][color=000000]Restart[/color][/center]"
+fit_content = true
+scroll_active = false
+
+[connection signal="timeout" from="2D World/Meteor Spawner/Spawn Timer" to="2D World/Meteor Spawner" method="spawn_meteor"]
+[connection signal="timeout" from="2D World/Meteor Spawner/Accelerator Timer" to="2D World/Meteor Spawner" method="_on_accelerate_spawner"]
+[connection signal="on_player_destroyed" from="2D World/Rocket" to="2D World/Meteor Spawner" method="clean_up"]
+[connection signal="on_player_destroyed" from="2D World/Rocket" to="2D World/Meteor Spawner/Spawn Timer" method="stop"]
+[connection signal="on_player_destroyed" from="2D World/Rocket" to="2D World/Meteor Spawner/Accelerator Timer" method="stop"]
+[connection signal="on_player_destroyed" from="2D World/Rocket" to="User Interface/Game Over Canvas" method="show"]
+[connection signal="on_player_destroyed" from="2D World/Rocket" to="User Interface/Game Over Canvas" method="set_process_mode" binds= [0]]
+[connection signal="area_shape_entered" from="2D World/Score Emitter" to="2D World/Score Emitter" method="_on_increase_score"]
+[connection signal="area_shape_entered" from="2D World/Destroyer" to="2D World/Destroyer" method="_on_area_trigger_entered"]
+[connection signal="on_released" from="User Interface/Controller Canvas/Horizontal Joystick" to="2D World/Rocket" method="_on_move_input_released"]
+[connection signal="on_trigger" from="User Interface/Controller Canvas/Horizontal Joystick" to="2D World/Rocket" method="_on_move_input_trigger"]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Meteor Spawner" method="reset_spawner_accelerator"]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Meteor Spawner/Spawn Timer" method="start"]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Meteor Spawner/Accelerator Timer" method="start"]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Rocket" method="show"]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Score Emitter" method="reset_score"]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="User Interface/Game Over Canvas" method="hide"]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Rocket" method="set_global_position" binds= [Vector2(270, 720)]]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Rocket" method="set_process_mode" binds= [0]]
+[connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="User Interface/Game Over Canvas" method="set_process_mode" binds= [4]]

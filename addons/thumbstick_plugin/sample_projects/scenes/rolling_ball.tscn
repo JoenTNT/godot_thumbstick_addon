@@ -1,26 +1,41 @@
-[gd_scene load_steps=10 format=3 uid="uid://q0x01vveiohx"]
+[gd_scene load_steps=15 format=3 uid="uid://q0x01vveiohx"]
 
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Camera3DFollower.gd" id="1_3oaoj"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PlayerBall3DControl.gd" id="1_7uvqn"]
 [ext_resource type="PackedScene" uid="uid://bc15gesn8lubs" path="res://addons/thumbstick_plugin/plugin/joysticks/normal_joystick.tscn" id="1_fkqti"]
 
 [sub_resource type="Environment" id="Environment_6iyyn"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_71vmc"]
-friction = 0.05
 bounce = 0.6
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_qiydh"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_nplx0"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b50cc"]
+diffuse_mode = 3
+albedo_color = Color(0.781057, 0.386738, 1, 1)
+
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_44tfb"]
 friction = 0.4
+bounce = 0.08
 
 [sub_resource type="BoxMesh" id="BoxMesh_2agwl"]
-size = Vector3(20, 0.1, 5)
+size = Vector3(20, 0.1, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n8epc"]
+diffuse_mode = 3
+albedo_color = Color(0.78623, 0.606656, 0.352515, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jg7rp"]
-size = Vector3(20, 0.1, 5)
+size = Vector3(20, 0.1, 20)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mkgt2"]
+size = Vector3(1, 4, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_xf4kc"]
+size = Vector3(1, 4, 20)
 
 [node name="Rolling Ball Game" type="Node"]
 
@@ -34,23 +49,29 @@ environment = SubResource("Environment_6iyyn")
 
 [node name="Stage" type="Node3D" parent="."]
 
-[node name="Camera Follow" type="Camera3D" parent="Stage"]
-transform = Transform3D(1, 0, 0, 0, 0.366875, 0.93027, 0, -0.93027, 0.366875, 0, 5.95643, 2.87725)
+[node name="Camera Follow" type="Camera3D" parent="Stage" node_paths=PackedStringArray("target_follow")]
+transform = Transform3D(1, 0, 0, 0, 0.656059, 0.75471, 0, -0.75471, 0.656059, 0, 5.95643, 4.87725)
 fov = 90.0
 near = 0.1
 far = 1024.0
+script = ExtResource("1_3oaoj")
+target_follow = NodePath("../Player")
+follow_offset = Vector3(0, 5.95643, 4.87725)
 
 [node name="Player" type="RigidBody3D" parent="Stage"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mass = 5.0
 physics_material_override = SubResource("PhysicsMaterial_71vmc")
+angular_damp = 0.8
 script = ExtResource("1_7uvqn")
+torque_speed = 480.0
 
 [node name="Collider" type="CollisionShape3D" parent="Stage/Player"]
 shape = SubResource("SphereShape3D_qiydh")
 
 [node name="Model" type="MeshInstance3D" parent="Stage/Player"]
 mesh = SubResource("SphereMesh_nplx0")
+surface_material_override/0 = SubResource("StandardMaterial3D_b50cc")
 
 [node name="Environment" type="Node3D" parent="."]
 
@@ -60,15 +81,32 @@ physics_material_override = SubResource("PhysicsMaterial_44tfb")
 
 [node name="Mesh" type="MeshInstance3D" parent="Environment/Floor"]
 mesh = SubResource("BoxMesh_2agwl")
+surface_material_override/0 = SubResource("StandardMaterial3D_n8epc")
 
 [node name="Collider" type="CollisionShape3D" parent="Environment/Floor"]
 shape = SubResource("BoxShape3D_jg7rp")
+
+[node name="Wall" type="StaticBody3D" parent="Environment"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 1.9, -4)
+physics_material_override = SubResource("PhysicsMaterial_44tfb")
+
+[node name="Mesh" type="MeshInstance3D" parent="Environment/Wall"]
+mesh = SubResource("BoxMesh_mkgt2")
+surface_material_override/0 = SubResource("StandardMaterial3D_n8epc")
+
+[node name="Collider" type="CollisionShape3D" parent="Environment/Wall"]
+shape = SubResource("BoxShape3D_xf4kc")
 
 [node name="Controller Canvas" type="CanvasLayer" parent="."]
 
 [node name="Movement Joystick" parent="Controller Canvas" node_paths=PackedStringArray("control_target_node") instance=ExtResource("1_fkqti")]
 anchors_preset = -1
-anchor_top = 0.5
-anchor_right = 0.45
+anchor_top = 0.6
+anchor_right = 0.5
+grow_horizontal = 1
+grow_vertical = 0
 control_target_node = NodePath("../../Stage/Player")
 _on_trigger_method_name = "_on_trigger"
+_on_pressed_method_name = "_on_pressed"
+_on_released_method_name = "_on_released"
+_debug_mode = false

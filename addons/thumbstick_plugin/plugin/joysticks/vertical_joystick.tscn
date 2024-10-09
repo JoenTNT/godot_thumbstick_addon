@@ -38,6 +38,7 @@ _on_released_method_name = "on_released"
 _on_tap_method_name = "on_tap"
 _debug_mode = true
 _visualize_gizmos = true
+_text_hint_color = Color(0, 0, 0, 1)
 _show_testing_info = false
 _editor_warnings = true
 
