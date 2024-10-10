@@ -18,7 +18,7 @@ _input_mode = "Normal"
 max_drag_radius = 64.0
 start_trigger_threshold = 16.0
 deadzone_radius_percentage = 0.2
-start_elapsed_on_trigger = true
+start_elapsed_on_trigger = false
 normalize_output = false
 inverse_output = false
 enable_tap_trigger = true
@@ -35,10 +35,7 @@ _on_trigger_method_name = "on_trigger"
 _on_pressed_method_name = "on_pressed"
 _on_released_method_name = "on_released"
 _on_tap_method_name = "on_tap"
-_debug_mode = true
-_visualize_gizmos = true
-_text_hint_color = Color(0, 0, 0, 1)
-_show_testing_info = false
+_debug_mode = false
 _editor_warnings = true
 
 [node name="Outer BG" type="TextureRect" parent="."]
