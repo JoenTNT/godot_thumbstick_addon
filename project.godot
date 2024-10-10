@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Thumbstick Plugin"
-config/description="A Single Scripted and yet most convenient setup Virtual Joystick on your Gameplay Screen."
+config/description="A Single Scripted and yet most convenient setup touch screen Joystick."
 config/version="1.0"
 run/main_scene="res://addons/thumbstick_plugin/plugin/testing.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
