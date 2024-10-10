@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://nxen3u7u5wgs" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_1.tscn" id="9_0ueyb"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreUpdater.gd" id="10_7i02q"]
 [ext_resource type="PackedScene" uid="uid://c3ujowln1lu63" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_2.tscn" id="10_pjuso"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scenes/SAMPLE_ScoreEmitter.gd" id="11_fc8mw"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreEmitter.gd" id="11_fc8mw"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Destroyer2D.gd" id="11_kh1pr"]
 
 [sub_resource type="Environment" id="Environment_hwvhw"]
@@ -217,7 +217,6 @@ _pressed_bg_tint = Color(1, 1, 1, 0.156863)
 _pressed_handle_tint = Color(0.745098, 0.745098, 0.745098, 0.156863)
 _transparent_bg_tint = Color(1, 1, 1, 0.0392157)
 _transparent_handle_tint = Color(1, 1, 1, 0.0392157)
-_debug_mode = false
 
 [node name="Game Over Canvas" type="CanvasLayer" parent="User Interface"]
 process_mode = 4

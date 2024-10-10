@@ -109,4 +109,3 @@ control_target_node = NodePath("../../Stage/Player")
 _on_trigger_method_name = "_on_trigger"
 _on_pressed_method_name = "_on_pressed"
 _on_released_method_name = "_on_released"
-_debug_mode = false
