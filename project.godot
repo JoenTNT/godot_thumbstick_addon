@@ -15,7 +15,7 @@ config/description="A Single Scripted and yet most convenient setup touch screen
 config/version="1.0"
 run/main_scene="res://addons/thumbstick_plugin/plugin/testing.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
-config/icon="res://addons/thumbstick_plugin/thumbstick_icon.png"
+config/icon="res://addons/thumbstick_plugin/plugin/plugin_icon.png"
 
 [display]
 

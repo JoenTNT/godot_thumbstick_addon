@@ -3,19 +3,19 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bw38u4v5fwgph"
-path="res://.godot/imported/thumbstick_icon.png-59aeca12a5ef985fb7c91596a8da3a79.ctex"
+path="res://.godot/imported/plugin_icon.png-d09aa6b14cb0cbf509e5e9c58cccb434.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/thumbstick_plugin/thumbstick_icon.png"
-dest_files=["res://.godot/imported/thumbstick_icon.png-59aeca12a5ef985fb7c91596a8da3a79.ctex"]
+source_file="res://addons/thumbstick_plugin/plugin/plugin_icon.png"
+dest_files=["res://.godot/imported/plugin_icon.png-d09aa6b14cb0cbf509e5e9c58cccb434.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/hdr_compression=1
