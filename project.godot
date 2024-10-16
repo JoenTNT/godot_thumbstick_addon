@@ -11,8 +11,8 @@ config_version=5
 [application]
 
 config/name="Thumbstick Plugin"
-config/description="A Single Scripted and yet most convenient setup touch screen Joystick."
-config/version="1.0"
+config/description="A Single Scripted and (yet) most convenient Mobile Screen Controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy setup validation."
+config/version="1.0.3"
 run/main_scene="res://addons/thumbstick_plugin/plugin/testing.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://addons/thumbstick_plugin/plugin/plugin_icon.png"
@@ -40,4 +40,4 @@ pointing/emulate_mouse_from_touch=false
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
-environment/defaults/default_clear_color=Color(0, 0, 0, 1)
+environment/defaults/default_clear_color=Color(0.0253638, 0.0253638, 0.0253638, 1)

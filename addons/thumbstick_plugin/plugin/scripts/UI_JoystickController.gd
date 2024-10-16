@@ -61,15 +61,14 @@ var _visibility_mode: String = VALW:
 	set(p_visibility):
 		_visibility_mode = p_visibility;
 		notify_property_list_changed();
-# TODO: Make input mode works.
+# Input mode based on direction input limitation.
 var _input_mode: String = INOR;
-# TODO: Make extra static size triggerable.
+# Extends rectangular static touch trigger area for joystick static mode.
 var extend_static_area_trigger: Vector2 = DEFAULT_EXTEND_STATIC_AREA_TRIGGER:
 	set(p_sst):
 		if p_sst.x < 0.0: p_sst.x = 0.0;
 		if p_sst.y < 0.0: p_sst.y = 0.0; 
 		extend_static_area_trigger = p_sst;
-# TODO: Fix Bug where the extra radius does not work.
 ## Extra radius in follow mode,
 ## prevents joystick display move until exceeds this tolerance.
 var follow_radius_tolerance: float = DEFAULT_FOLLOW_RADIUS_TOLERANCE:

@@ -19,19 +19,19 @@ const TJC_VISIBILITY_TOUCHSCREEN: String = "Touchscreen";
 
 ## Joystick Input has been completely disabled.
 ## This mode disabled all the events including press and release input.
-const TJC_INPUT_DISABLED: String = "Disabled";
+## NOTE: Has been removed and replaced to editable status joystick.
+##const TJC_INPUT_DISABLED: String = "Disabled";
 
 ## Joystick cannot be moved but tap only input.
 ## This mode does not disabled preesed and released input.
-const TJC_INPUT_TAPONLY: String = "Tap Only";
+## NOTE: Has been removed and replaced to controller setting enable tap trigger
+##const TJC_INPUT_TAPONLY: String = "Tap Only";
 
 ## Joystick can be moved only horizontally.
-## This mode will include tap, press, and release input.
 const TJC_INPUT_HORIZONTALONLY: String = "Horizontal Only";
 
 ## Joystick can be moved only vertically.
-## This mode will include tap, press, and release input.
 const TJC_INPUT_VERTICALONLY: String = "Vertical Only";
 
-## This is the default 2 dimentional joystick input.
+## This is the default 2 axis direction joystick input.
 const TJC_INPUT_NORMAL: String = "Normal";

@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://deo32sacns60d"
+path="res://.godot/imported/Rocket Crashed.ogg-7934a73ac5cdfb0c1ec3639d038e9122.oggvorbisstr"
+
+[deps]
+
+source_file="res://addons/thumbstick_plugin/sample_projects/assets/audio/Rocket Crashed.ogg"
+dest_files=["res://.godot/imported/Rocket Crashed.ogg-7934a73ac5cdfb0c1ec3639d038e9122.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

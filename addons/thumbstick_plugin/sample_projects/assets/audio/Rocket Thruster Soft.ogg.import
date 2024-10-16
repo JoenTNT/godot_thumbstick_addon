@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://db8jrs8nadepn"
+path="res://.godot/imported/Rocket Thruster Soft.ogg-d9a2a7365d7cac8bb3b807b6951ad3da.oggvorbisstr"
+
+[deps]
+
+source_file="res://addons/thumbstick_plugin/sample_projects/assets/audio/Rocket Thruster Soft.ogg"
+dest_files=["res://.godot/imported/Rocket Thruster Soft.ogg-d9a2a7365d7cac8bb3b807b6951ad3da.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://6cdpyhwscyxl"]
+[gd_scene load_steps=26 format=3 uid="uid://6cdpyhwscyxl"]
 
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_MeteorSpawner.gd" id="1_2h5cx"]
 [ext_resource type="Texture2D" uid="uid://bbgmeakxmui2" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk3.png" id="1_fyfjd"]
@@ -13,10 +13,8 @@
 [ext_resource type="PackedScene" uid="uid://nxen3u7u5wgs" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_1.tscn" id="9_0ueyb"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreUpdater.gd" id="10_7i02q"]
 [ext_resource type="PackedScene" uid="uid://c3ujowln1lu63" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_2.tscn" id="10_pjuso"]
-[ext_resource type="AudioStream" uid="uid://db8jrs8nadepn" path="res://addons/thumbstick_plugin/sample_projects/assets/audio/Rocket Thruster Soft.ogg" id="11_3kcyd"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreEmitter.gd" id="11_fc8mw"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Destroyer2D.gd" id="11_kh1pr"]
-[ext_resource type="AudioStream" uid="uid://deo32sacns60d" path="res://addons/thumbstick_plugin/sample_projects/assets/audio/Rocket Crashed.ogg" id="12_jagwq"]
 
 [sub_resource type="Environment" id="Environment_hwvhw"]
 
@@ -91,9 +89,6 @@ size = Vector2(720, 80)
 [node name="Camera2D" type="Camera2D" parent="2D World"]
 anchor_mode = 0
 
-[node name="AudioListener2D" type="AudioListener2D" parent="2D World/Camera2D"]
-current = true
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="2D World"]
 environment = SubResource("Environment_hwvhw")
 
@@ -107,7 +102,6 @@ preprocess = 8.0
 speed_scale = 2.0
 randomness = 0.1
 fixed_fps = 24
-trail_lifetime = 3.41
 
 [node name="Meteor Spawner" type="Area2D" parent="2D World"]
 position = Vector2(270, -108)
@@ -147,20 +141,6 @@ texture = ExtResource("5_7mq6k")
 
 [node name="Collider" type="CollisionShape2D" parent="2D World/Rocket"]
 shape = SubResource("CapsuleShape2D_fxk7j")
-
-[node name="Thruster SFX" type="AudioStreamPlayer2D" parent="2D World/Rocket"]
-stream = ExtResource("11_3kcyd")
-volume_db = 5.0
-autoplay = true
-max_distance = 2048.0
-attenuation = 0.0426888
-parameters/looping = true
-
-[node name="Crashed SFX" type="AudioStreamPlayer2D" parent="2D World"]
-position = Vector2(270, 720)
-stream = ExtResource("12_jagwq")
-volume_db = -8.0
-pitch_scale = 0.8
 
 [node name="Rightside Bound" type="StaticBody2D" parent="2D World"]
 position = Vector2(540, 0)
@@ -224,18 +204,19 @@ script = ExtResource("10_7i02q")
 
 [node name="Controller Canvas" type="CanvasLayer" parent="User Interface"]
 
-[node name="Horizontal Joystick" parent="User Interface/Controller Canvas" node_paths=PackedStringArray("control_target_node") instance=ExtResource("2_4gru8")]
+[node name="Horizontal Joystick" parent="User Interface/Controller Canvas" instance=ExtResource("2_4gru8")]
 anchors_preset = -1
-anchor_top = 0.7
+anchor_top = 0.725
+grow_vertical = 0
 _mode = "Dynamic"
-_base_color = Color(0, 0.401091, 0.401142, 1)
-_normal_bg_tint = Color(1, 1, 1, 0.0823529)
-_normal_handle_tint = Color(1, 1, 1, 0.0941176)
-_pressed_bg_tint = Color(1, 1, 1, 0.184314)
-_pressed_handle_tint = Color(0.745098, 0.745098, 0.745098, 0.188235)
-control_target_node = NodePath("../../../2D World/Rocket")
-_on_trigger_method_name = "_on_move_input_trigger"
-_on_released_method_name = "_on_move_input_released"
+_visibility_mode = "Touchscreen"
+_base_color = Color(0.145098, 0.615686, 1, 1)
+_normal_bg_tint = Color(1, 1, 1, 0.156863)
+_normal_handle_tint = Color(1, 1, 1, 0.156863)
+_pressed_bg_tint = Color(1, 1, 1, 0.847059)
+_pressed_handle_tint = Color(0.745098, 0.745098, 0.745098, 0.741176)
+_transparent_bg_tint = Color(1, 1, 1, 0.0392157)
+_transparent_handle_tint = Color(1, 1, 1, 0.0392157)
 
 [node name="Game Over Canvas" type="CanvasLayer" parent="User Interface"]
 process_mode = 4
@@ -307,11 +288,12 @@ scroll_active = false
 [connection signal="on_player_destroyed" from="2D World/Rocket" to="2D World/Meteor Spawner" method="clean_up"]
 [connection signal="on_player_destroyed" from="2D World/Rocket" to="2D World/Meteor Spawner/Spawn Timer" method="stop"]
 [connection signal="on_player_destroyed" from="2D World/Rocket" to="2D World/Meteor Spawner/Accelerator Timer" method="stop"]
-[connection signal="on_player_destroyed" from="2D World/Rocket" to="2D World/Crashed SFX" method="play"]
 [connection signal="on_player_destroyed" from="2D World/Rocket" to="User Interface/Game Over Canvas" method="show"]
 [connection signal="on_player_destroyed" from="2D World/Rocket" to="User Interface/Game Over Canvas" method="set_process_mode" binds= [0]]
 [connection signal="area_shape_entered" from="2D World/Score Emitter" to="2D World/Score Emitter" method="_on_increase_score"]
 [connection signal="area_shape_entered" from="2D World/Destroyer" to="2D World/Destroyer" method="_on_area_trigger_entered"]
+[connection signal="on_released" from="User Interface/Controller Canvas/Horizontal Joystick" to="2D World/Rocket" method="_on_move_input_released"]
+[connection signal="on_trigger" from="User Interface/Controller Canvas/Horizontal Joystick" to="2D World/Rocket" method="_on_move_input_trigger"]
 [connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Meteor Spawner" method="reset_spawner_accelerator"]
 [connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Meteor Spawner/Spawn Timer" method="start"]
 [connection signal="pressed" from="User Interface/Game Over Canvas/Center Alignment/Buttons/Button" to="2D World/Meteor Spawner/Accelerator Timer" method="start"]
