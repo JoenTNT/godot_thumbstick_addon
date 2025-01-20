@@ -11,8 +11,8 @@ config_version=5
 [application]
 
 config/name="Thumbstick Plugin"
-config/description="A Single Scripted and (yet) most convenient Mobile Screen Controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy setup validation."
-config/version="1.0.3"
+config/description="A Single Scripted and (yet) most convenient mobile controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy mobile controller setup validation."
+config/version="1.1.0"
 run/main_scene="res://addons/thumbstick_plugin/plugin/test_samples/multitouch_testing.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://addons/thumbstick_plugin/plugin/plugin_icon.png"

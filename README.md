@@ -66,5 +66,10 @@ You can completely manually customize yourself by editing or duplicating presets
 
 ---
 
-### **B. TOUCH MOTION SURFACE CONTROLLER**
-### [ \~\~ IN DEVELOPMENT \~\~ ]
+### **B. MULTITOUCH CONTROLLER**
+
+<div align=center>
+    <img src=".\addons\thumbstick_plugin\sample_projects\screenshots\multitouch_controller_preview.png"/>
+</div>
+
+---
