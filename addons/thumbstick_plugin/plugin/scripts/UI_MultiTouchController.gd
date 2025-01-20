@@ -334,6 +334,10 @@ func _draw() -> void:
 		# Draw text information on screen.
 		_temp_touch_text_hint_pos += _gizmos_text_hint_offset;
 		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,
+			"Index: %d" % k,
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
+		_temp_touch_text_hint_pos += Vector2(0.0, 14.0);
+		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,
 			"Is Triggered: %s" % ("True" if _temp_draw_touch[CACHE_KEY_IS_TRIGGERED] else "False"),
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
 		_temp_touch_text_hint_pos += Vector2(0.0, 14.0);
