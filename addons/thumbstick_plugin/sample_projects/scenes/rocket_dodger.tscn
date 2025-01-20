@@ -5,7 +5,7 @@
 [ext_resource type="Theme" uid="uid://ckoenjphd51gp" path="res://addons/thumbstick_plugin/sample_projects/assets/tsp_theme.tres" id="1_mqn6o"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Rocket.gd" id="1_t5oqw"]
 [ext_resource type="Texture2D" uid="uid://cimth1txmveon" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/circle_32x32.png" id="1_uk3dp"]
-[ext_resource type="PackedScene" uid="uid://7f1tiihm3jvh" path="res://addons/thumbstick_plugin/plugin/joysticks/horizontal_joystick.tscn" id="2_4gru8"]
+[ext_resource type="PackedScene" uid="uid://7f1tiihm3jvh" path="res://addons/thumbstick_plugin/plugin/controllers/horizontal_joystick.tscn" id="2_4gru8"]
 [ext_resource type="Texture2D" uid="uid://t4nvbk3okhid" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk4.png" id="2_f5sm7"]
 [ext_resource type="Texture2D" uid="uid://cvlir1v3xnmc1" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk2.png" id="3_btp4d"]
 [ext_resource type="Texture2D" uid="uid://c0cggf5u2lj0a" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk1.png" id="4_xujaw"]

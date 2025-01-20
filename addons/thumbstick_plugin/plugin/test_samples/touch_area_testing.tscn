@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://rt48154iiw5n"]
+
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/plugin/scripts/UI_TouchSurfaceController.gd" id="1_f1ca4"]
+
+[node name="TMS Testing" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_f1ca4")
+_max_touch_amount = 4
+start_trigger_threshold = 16.0
+_tap_trigger_enabled = true
+_cancel_tap_threshold = 0.2
+_on_touch_pressed_method_name = "on_pressed"
+_on_touch_dragged_method_name = "on_dragged"
+_on_touch_released_method_name = "on_released"
+_on_touch_released_method_name = "on_released"
+_debug_mode = false
