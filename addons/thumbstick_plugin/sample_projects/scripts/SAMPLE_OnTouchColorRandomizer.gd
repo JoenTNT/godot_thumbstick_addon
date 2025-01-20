@@ -1,0 +1,2 @@
+class_name SAMPLE_OnTouchColorRandomizer
+extends Node

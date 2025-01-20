@@ -1,0 +1,78 @@
+[gd_scene load_steps=11 format=3 uid="uid://bpplhw1xggw76"]
+
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PhysicalTouchColliderEffect.gd" id="1_5xpq7"]
+[ext_resource type="PackedScene" uid="uid://bn2b4j8n5wv2t" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/pebble.tscn" id="2_nlpqn"]
+[ext_resource type="PackedScene" uid="uid://dwn5r5yuoqyjw" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/touch_collider.tscn" id="2_ukw16"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PebbleSpawner.gd" id="2_xwby6"]
+[ext_resource type="PackedScene" uid="uid://b6j27wv1bqel7" path="res://addons/thumbstick_plugin/plugin/controllers/multitouch_controller.tscn" id="3_byaqh"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h8qu8"]
+friction = 0.0
+bounce = 0.4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2uvoh"]
+size = Vector2(480, 880)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_tt8wi"]
+friction = 0.2
+bounce = 0.4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_abe5t"]
+size = Vector2(20, 960)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f86im"]
+size = Vector2(580, 20)
+
+[node name="Box-o-pebbles" type="Node"]
+
+[node name="Physical Toucher" type="RigidBody2D" parent="."]
+collision_layer = 256
+collision_mask = 256
+physics_material_override = SubResource("PhysicsMaterial_h8qu8")
+gravity_scale = 0.0
+freeze_mode = 1
+continuous_cd = 1
+script = ExtResource("1_5xpq7")
+_touch_collider_preset = ExtResource("2_ukw16")
+
+[node name="Pebble Spawner" type="Node2D" parent="." node_paths=PackedStringArray("_pebble_container")]
+position = Vector2(270, 480)
+script = ExtResource("2_xwby6")
+_spawn_area = SubResource("RectangleShape2D_2uvoh")
+_pebble_prefab = ExtResource("2_nlpqn")
+_pebble_container = NodePath(".")
+_debug_mode = false
+
+[node name="Play Area" type="StaticBody2D" parent="."]
+collision_layer = 256
+collision_mask = 256
+physics_material_override = SubResource("PhysicsMaterial_tt8wi")
+
+[node name="Left Wall" type="CollisionShape2D" parent="Play Area"]
+position = Vector2(-10, 480)
+shape = SubResource("RectangleShape2D_abe5t")
+
+[node name="Right Wall" type="CollisionShape2D" parent="Play Area"]
+position = Vector2(550, 480)
+shape = SubResource("RectangleShape2D_abe5t")
+
+[node name="Top Wall" type="CollisionShape2D" parent="Play Area"]
+position = Vector2(270, -10)
+shape = SubResource("RectangleShape2D_f86im")
+
+[node name="Bottom Wall" type="CollisionShape2D" parent="Play Area"]
+position = Vector2(270, 970)
+shape = SubResource("RectangleShape2D_f86im")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Multitouch Controller" parent="CanvasLayer" node_paths=PackedStringArray("control_target_node") instance=ExtResource("3_byaqh")]
+control_target_node = NodePath("../../Physical Toucher")
+_debug_mode = true
+_visualize_gizmos = true
+_gizmos_inactive_trigger_color = Color(1, 0, 0, 1)
+_gizmos_active_trigger_color = Color(0, 1, 0, 1)
+_gizmos_touch_hint_radius = 48.0
+_gizmos_text_hint_color = Color(1, 1, 1, 1)
+_gizmos_text_hint_offset = Vector2(-64, 84)
+_editor_warnings = true

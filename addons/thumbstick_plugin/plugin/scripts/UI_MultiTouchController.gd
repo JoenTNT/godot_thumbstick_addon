@@ -317,19 +317,21 @@ func _draw() -> void:
 			_temp_touch_text_hint_pos = _temp_draw_touch[CACHE_KEY_TOUCH_POSITION];
 			_gizmos_color_when_trigger = Color.CYAN;
 			_gizmos_color_when_trigger.a = 0.25;
+			_gizmos_color = _gizmos_active_trigger_color;
+			_gizmos_color.a = 0.3;
+			draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_POSITION], start_trigger_threshold, _gizmos_color);
 		else:
 			_temp_touch_text_hint_pos = _temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION];
 			_gizmos_color_when_trigger = Color.BLUE;
 			_gizmos_color_when_trigger.a = 0.25;
-			if _tap_trigger_enabled:
-				if _temp_draw_touch[CACHE_KEY_RUNNING_ELAPSED_TIME] < _cancel_tap_threshold:
-					_gizmos_color = Color.YELLOW;
-					_gizmos_color.a = 0.3;
-					draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION], start_trigger_threshold, _gizmos_color);
-				else:
-					_gizmos_color = Color.RED;
-					_gizmos_color.a = 0.3;
-					draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION], start_trigger_threshold, _gizmos_color);
+			if _tap_trigger_enabled && _temp_draw_touch[CACHE_KEY_RUNNING_ELAPSED_TIME] < _cancel_tap_threshold:
+				_gizmos_color = _gizmos_pretap_trigger_color;
+				_gizmos_color.a = 0.3;
+				draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION], start_trigger_threshold, _gizmos_color);
+			else:
+				_gizmos_color = _gizmos_inactive_trigger_color;
+				_gizmos_color.a = 0.3;
+				draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION], start_trigger_threshold, _gizmos_color);
 		draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_POSITION], _gizmos_touch_hint_radius, _gizmos_color_when_trigger);
 		# Draw text information on screen.
 		_temp_touch_text_hint_pos += _gizmos_text_hint_offset;
@@ -339,10 +341,6 @@ func _draw() -> void:
 		_temp_touch_text_hint_pos += Vector2(0.0, 14.0);
 		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,
 			"Is Triggered: %s" % ("True" if _temp_draw_touch[CACHE_KEY_IS_TRIGGERED] else "False"),
-			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
-		_temp_touch_text_hint_pos += Vector2(0.0, 14.0);
-		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,
-			"Is Pressed: %s" % ("True" if _temp_draw_touch[CACHE_KEY_IS_PRESSED] else "False"),
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
 		_temp_touch_text_hint_pos += Vector2(0.0, 14.0);
 		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,

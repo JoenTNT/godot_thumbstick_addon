@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://bn2b4j8n5wv2t"]
+
+[ext_resource type="Texture2D" uid="uid://cimth1txmveon" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/circle_32x32.png" id="1_kaa2m"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_OnTouchColorRandomizer.gd" id="1_tmd15"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ooonl"]
+friction = 0.2
+bounce = 0.1
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6huhb"]
+radius = 16.0
+
+[node name="Pebble" type="RigidBody2D"]
+collision_layer = 256
+collision_mask = 256
+mass = 0.001
+physics_material_override = SubResource("PhysicsMaterial_ooonl")
+continuous_cd = 2
+script = ExtResource("1_tmd15")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_kaa2m")
+
+[node name="Collider" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_6huhb")
