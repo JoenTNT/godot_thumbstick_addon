@@ -8,7 +8,8 @@
 </div>
 
 ---
-> A Single Scripted and <ins>(yet) __most convenient__</ins> Mobile Screen Controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy setup validation.
+
+> A Single Scripted and <ins>(yet) __most convenient__</ins> most convenient mobile controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy mobile controller setup validation.
 
 <div align=center>
     <img src=".\addons\thumbstick_plugin\sample_projects\screenshots\preview_joysticks.png">

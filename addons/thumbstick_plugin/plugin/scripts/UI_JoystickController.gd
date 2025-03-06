@@ -3,17 +3,17 @@ class_name UI_JoystickController extends Control
 
 # NOTE: Y Axis is inversed by default, up means minus.
 ## Event called when pointer touch begin only inside the area.
-signal on_pressed(pressPosition: Vector2);
+signal on_pressed(args: JoystickOnPressed);
 
 ## Event called when tap on the joystick area.
-signal on_tap(tapPosition: Vector2);
+signal on_tap(args: JoystickOnTap);
 
 ## Event called when dragging trigger, 
 ## input value will always has radius magnitude from 0 to 1.
-signal on_trigger(input_v: Vector2, elapsed: float);
+signal on_trigger(args: JoystickOnTriggered);
 
 ## Event called when pointer touch just has been released.
-signal on_released(releasePosition: Vector2, elapsed: float);
+signal on_released(args: JoystickOnReleased);
 
 # Constants alias.
 const MSTC = THUMMBSTICK_CONSTANTS.TJC_MODE_STATIC;
@@ -167,6 +167,10 @@ var _editor_warnings: bool = true;
 @onready var _inner_joystick: TextureRect = $"Outer BG/Inner CTRL";
 @onready var _outer_origin_position: Vector2 = $"Outer BG".get_screen_position();
 @onready var _inner_origin_position: Vector2 = $"Outer BG/Inner CTRL".get_screen_position();
+@onready var _on_pressed_data: JoystickOnPressed = JoystickOnPressed.new();
+@onready var _on_tap_data: JoystickOnTap = JoystickOnTap.new();
+@onready var _on_trigger_data: JoystickOnTriggered = JoystickOnTriggered.new();
+@onready var _on_released_data: JoystickOnReleased = JoystickOnReleased.new();
 
 var _touch_index: int = -1;
 var _touch_pressed_position: Vector2 = Vector2.ZERO;
@@ -764,10 +768,11 @@ func _on_pressed(start_point: Vector2, start_t: float) -> void:
 			_expected_outer_color = _base_color * _pressed_bg_tint;
 			_expected_inner_color = _base_color * _pressed_handle_tint;
 	# Call Event
+	_on_pressed_data.press_position = start_point;
 	if control_target_node != null:
 		if control_target_node.has_method(_on_pressed_method_name):
-			control_target_node.call(_on_pressed_method_name, start_point);
-	on_pressed.emit(_touch_pressed_position);
+			control_target_node.call(_on_pressed_method_name, _on_pressed_data);
+	on_pressed.emit(_on_pressed_data);
 
 func _on_before_trigger(pre_point: Vector2, _pre_t: float) -> void:
 	_inner_half_size = _inner_joystick.size / 2.0;
@@ -833,10 +838,12 @@ func _on_trigger(point: Vector2, elapsed: float):
 			if normalize_output: input_v = 1.0;
 			final_result = (-1 if inverse_output else 1) * normal_dir * input_v;
 	# Call event.
+	_on_trigger_data.input_v = final_result;
+	_on_trigger_data.elapsed = elapsed;
 	if control_target_node != null:
 		if control_target_node.has_method(_on_trigger_method_name):
-			control_target_node.call(_on_trigger_method_name, final_result, elapsed);
-	on_trigger.emit(final_result, elapsed);
+			control_target_node.call(_on_trigger_method_name, _on_trigger_data);
+	on_trigger.emit(_on_trigger_data);
 
 func _on_released(last_point: Vector2, last_elapsed: float) -> void:
 	_is_pressed = false;
@@ -854,14 +861,17 @@ func _on_released(last_point: Vector2, last_elapsed: float) -> void:
 		_expected_inner_color = _base_color * _normal_handle_tint;
 	# Call events.
 	if enable_tap_trigger && last_elapsed < cancel_tap_trigger_threshold:
+		_on_tap_data.tap_position = last_point;
 		if control_target_node != null:
 			if control_target_node.has_method(_on_tap_method_name):
-				control_target_node.call(_on_tap_method_name, last_point);
-		on_tap.emit(last_point);
+				control_target_node.call(_on_tap_method_name, _on_tap_data);
+		on_tap.emit(_on_tap_data);
+	_on_released_data.release_position = last_point;
+	_on_released_data.elapsed = last_elapsed;
 	if control_target_node != null:
 		if control_target_node.has_method(_on_released_method_name):
-			control_target_node.call(_on_released_method_name, last_point, last_elapsed);
-	on_released.emit(last_point, last_elapsed);
+			control_target_node.call(_on_released_method_name, _on_released_data);
+	on_released.emit(_on_released_data);
 
 func _is_point_inside_area(point: Vector2) -> bool:
 	var cs: Vector2 = get_global_transform_with_canvas().get_scale();

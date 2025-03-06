@@ -4,20 +4,20 @@ class_name UI_TouchSurfaceController extends Control
 # TODO: Finish the Prototype.
 ## Called when touch pressed on screen.
 ## It is recommended to cache touch owner index to track each touches.
-signal on_touch_pressed(finger_index: int, touch_amount: int, pressed_position: Vector2);
+signal on_touch_pressed(args: MultiTouchOnPressed);
 
 ## Called when touch is being dragged.
 ## It is recommended to use cached touch owner index to track each touches.
-signal on_touch_dragged(finger_index: int, drag_pos: Vector2, drag_dir: Vector2, drag_magnitude: float);
+signal on_touch_dragged(args: MultiTouchOnDragged);
 
 ## Called when tap on the screen before cancelation threshold.
 ## This only works if [code]_tap_trigger_enabled[/code] enabled.
 ## It is recommended to use cached touch owner index to track each touches.
-signal on_touch_tap(figner_index: int, touch_amount: int, tap_position: Vector2);
+signal on_touch_tap(args: MultiTouchOnTap);
 
 ## Called when touch has been released.
 ## It is recommended to use cached touch owner index to track each touches.
-signal on_touch_released(figner_index: int, touch_amount: int, latest_position: Vector2);
+signal on_touch_released(args: MultiTouchOnReleased);
 
 # Constant aliases.
 const ASSETS_PATH = "res://addons/thumbstick_plugin/plugin/assets/";
@@ -110,6 +110,10 @@ var _gizmos_text_hint_color: Color = DEFAULT_GIZMOS_TEXT_COLOR;
 var _editor_warnings: bool = true;
 
 # Runtime variable data.
+@onready var _on_pressed_data: MultiTouchOnPressed = MultiTouchOnPressed.new();
+@onready var _on_dragged_data: MultiTouchOnDragged = MultiTouchOnDragged.new();
+@onready var _on_released_data: MultiTouchOnReleased = MultiTouchOnReleased.new();
+@onready var _on_tapped_data: MultiTouchOnTap = MultiTouchOnTap.new();
 var _current_touch_count: int = 0;
 var _cached_touches: Dictionary = {};
 var _temp_touch: Dictionary;
@@ -180,7 +184,7 @@ func _get_property_list() -> Array[Dictionary]:
 	}]);
 	if _tap_trigger_enabled:
 		r.append({
-			"name": &"_on_touch_released_method_name",
+			"name": &"_on_touch_tap_method_name",
 			"type": TYPE_STRING,
 			"usage": PROPERTY_USAGE_DEFAULT,
 		});
@@ -378,23 +382,34 @@ func _on_touch_pressed(index: int, point: Vector2) -> void:
 	_temp_touch[CACHE_KEY_TOUCH_START_POSITION] = point;
 	_temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT] = _temp_unix_time_now;
 	_temp_touch[CACHE_KEY_RUNNING_ELAPSED_TIME] = 0.0;
+	# Cached data.
+	_on_pressed_data.finger_index = index;
+	_on_pressed_data.touch_amount = _current_touch_count;
+	_on_pressed_data.pressed_position = _temp_touch[CACHE_KEY_TOUCH_START_POSITION];
+	# Call events.
 	if control_target_node != null:
 		if control_target_node.has_method(_on_touch_pressed_method_name):
-			control_target_node.call(_on_touch_pressed_method_name, index, _current_touch_count, _temp_touch[CACHE_KEY_TOUCH_START_POSITION]);
-	on_touch_pressed.emit(index, _current_touch_count, _temp_touch[CACHE_KEY_TOUCH_START_POSITION]);
+			control_target_node.call(_on_touch_pressed_method_name, _on_pressed_data);
+	on_touch_pressed.emit(_on_pressed_data);
 
 func _on_touch_released(index: int, point: Vector2) -> void:
 	_temp_touch = _cached_touches[index];
 	_temp_time_elapsed = Time.get_unix_time_from_system() - _temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT];
 	if _temp_time_elapsed < _cancel_tap_threshold:
+		_on_tapped_data.figner_index = index;
+		_on_tapped_data.touch_amount = _current_touch_count;
+		_on_tapped_data.tap_position = _temp_touch[CACHE_KEY_TOUCH_START_POSITION];
 		if control_target_node != null:
 			if control_target_node.has_method(_on_touch_tap_method_name):
-				control_target_node.call(_on_touch_tap_method_name, index, _current_touch_count, _temp_touch[CACHE_KEY_TOUCH_START_POSITION]);
-		on_touch_tap.emit(index, _current_touch_count, _temp_touch[CACHE_KEY_TOUCH_START_POSITION]);
+				control_target_node.call(_on_touch_tap_method_name, _on_tapped_data);
+		on_touch_tap.emit(_on_tapped_data);
+	_on_released_data.figner_index = index;
+	_on_released_data.touch_amount = _current_touch_count;
+	_on_released_data.latest_position = _temp_touch[CACHE_KEY_TOUCH_POSITION];
 	if control_target_node != null:
 		if control_target_node.has_method(_on_touch_released_method_name):
-			control_target_node.call(_on_touch_released_method_name, index, _current_touch_count, _temp_touch[CACHE_KEY_TOUCH_POSITION]);
-	on_touch_released.emit(index, _current_touch_count, _temp_touch[CACHE_KEY_TOUCH_POSITION]);
+			control_target_node.call(_on_touch_released_method_name, _on_released_data);
+	on_touch_released.emit(_on_released_data);
 	_cached_touches.erase(index);
 
 func _on_touch_drag(e: InputEventScreenDrag) -> void:
@@ -416,16 +431,16 @@ func _on_touch_triggered(index: int, point: Vector2) -> void:
 	_temp_dragged_magnitude = _temp_dragged_direction.length();
 	_temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION] = _temp_dragged_direction.normalized();
 	_temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE] = _temp_dragged_magnitude;
+	# Cached data.
+	_on_dragged_data.finger_index = index;
+	_on_dragged_data.drag_pos = _temp_touch[CACHE_KEY_TOUCH_POSITION];
+	_on_dragged_data.drag_dir = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION];
+	_on_dragged_data.drag_magnitude = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE];
+	# Call events.
 	if control_target_node != null:
 		if control_target_node.has_method(_on_touch_dragged_method_name):
-			control_target_node.call(_on_touch_dragged_method_name, index,
-				_temp_touch[CACHE_KEY_TOUCH_POSITION],
-				_temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION],
-				_temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE]);
-	on_touch_dragged.emit(index,
-		_temp_touch[CACHE_KEY_TOUCH_POSITION],
-		_temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION],
-		_temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE]);
+			control_target_node.call(_on_touch_dragged_method_name, _on_dragged_data);
+	on_touch_dragged.emit(_on_dragged_data);
 
 ## Clear all touch temporary data from caches.
 func _clear_caches() -> void: _cached_touches.clear();

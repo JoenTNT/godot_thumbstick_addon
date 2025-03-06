@@ -20,22 +20,22 @@ func _physics_process(delta: float) -> void:
 		_expected_position = _temp_touch_info[EXPECTED_POSITION_KEY];
 		_temp_touch_collider.set_deferred(&"global_position", _expected_position);
 
-func on_pressed(index: int, touch_amount: int, pressed_position: Vector2) -> void:
-	_temp_touch_info = _cache_touch_points.get_or_add(index, {});
+func on_pressed(arg: MultiTouchOnPressed) -> void:
+	_temp_touch_info = _cache_touch_points.get_or_add(arg.finger_index, {});
 	if not _temp_touch_info.has(TOUCH_COLLIDER_KEY):
 		_temp_touch_collider = _touch_collider_preset.instantiate();
 		_temp_touch_info[TOUCH_COLLIDER_KEY] = _temp_touch_collider;
 		call_deferred(&"add_child", _temp_touch_collider);
 	_temp_touch_collider = _temp_touch_info[TOUCH_COLLIDER_KEY];
-	_temp_touch_info[EXPECTED_POSITION_KEY] = pressed_position;
+	_temp_touch_info[EXPECTED_POSITION_KEY] = arg.pressed_position;
 	_temp_touch_collider.set_deferred(&"disabled", false);
 
-func on_dragged(index: int, drag_pos: Vector2, drag_dir: Vector2, drag_magnitude: float) -> void:
-	_temp_touch_info = _cache_touch_points[index];
+func on_dragged(args: MultiTouchOnDragged) -> void:
+	_temp_touch_info = _cache_touch_points[args.finger_index];
 	_temp_touch_collider = _temp_touch_info[TOUCH_COLLIDER_KEY];
-	_temp_touch_info[EXPECTED_POSITION_KEY] = drag_pos;
+	_temp_touch_info[EXPECTED_POSITION_KEY] = args.drag_pos;
 
-func on_released(index: int, touch_amount: int, latest_position: Vector2) -> void:
-	_temp_touch_info = _cache_touch_points[index];
+func on_released(args: MultiTouchOnReleased) -> void:
+	_temp_touch_info = _cache_touch_points[args.figner_index];
 	_temp_touch_collider = _temp_touch_info[TOUCH_COLLIDER_KEY];
 	_temp_touch_collider.disabled = true;

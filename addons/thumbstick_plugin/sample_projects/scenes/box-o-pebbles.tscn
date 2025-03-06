@@ -23,9 +23,10 @@ size = Vector2(20, 960)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f86im"]
 size = Vector2(580, 20)
 
-[node name="Box-o-pebbles" type="Node"]
+[node name="Box-o-pebbles" type="Node2D"]
 
 [node name="Physical Toucher" type="RigidBody2D" parent="."]
+physics_interpolation_mode = 1
 collision_layer = 256
 collision_mask = 256
 physics_material_override = SubResource("PhysicsMaterial_h8qu8")
@@ -41,9 +42,11 @@ script = ExtResource("2_xwby6")
 _spawn_area = SubResource("RectangleShape2D_2uvoh")
 _pebble_prefab = ExtResource("2_nlpqn")
 _pebble_container = NodePath(".")
+_initial_amount = 5
 _debug_mode = false
 
 [node name="Play Area" type="StaticBody2D" parent="."]
+physics_interpolation_mode = 1
 collision_layer = 256
 collision_mask = 256
 physics_material_override = SubResource("PhysicsMaterial_tt8wi")
@@ -68,8 +71,10 @@ shape = SubResource("RectangleShape2D_f86im")
 
 [node name="Multitouch Controller" parent="CanvasLayer" node_paths=PackedStringArray("control_target_node") instance=ExtResource("3_byaqh")]
 control_target_node = NodePath("../../Physical Toucher")
+_on_touch_tap_method_name = "on_tap"
 _debug_mode = true
 _visualize_gizmos = true
+_gizmos_pretap_trigger_color = Color(1, 1, 0, 1)
 _gizmos_inactive_trigger_color = Color(1, 0, 0, 1)
 _gizmos_active_trigger_color = Color(0, 1, 0, 1)
 _gizmos_touch_hint_radius = 48.0

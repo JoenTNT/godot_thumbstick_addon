@@ -10,9 +10,9 @@ config_version=5
 
 [application]
 
-config/name="Thumbstick Plugin"
+config/name="Thumbstick"
 config/description="A Single Scripted and (yet) most convenient mobile controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy mobile controller setup validation."
-config/version="1.1.0"
+config/version="1.2.0"
 run/main_scene="res://addons/thumbstick_plugin/plugin/test_samples/multitouch_testing.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://addons/thumbstick_plugin/plugin/plugin_icon.png"
@@ -31,6 +31,7 @@ pointing/emulate_mouse_from_touch=false
 
 [physics]
 
+2d/physics_engine="GodotPhysics2D"
 3d/physics_engine="GodotPhysics3D"
 3d/default_linear_damp=0.0
 3d/default_angular_damp=0.0
