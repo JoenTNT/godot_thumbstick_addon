@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://8skifg2uq8yj"]
+
+[ext_resource type="Texture2D" uid="uid://cimth1txmveon" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/circle_32x32.png" id="1_vlkj2"]
+
+[node name="PointerColor" type="Sprite2D"]
+process_mode = 4
+visible = false
+scale = Vector2(3.65, 3.65)
+texture = ExtResource("1_vlkj2")

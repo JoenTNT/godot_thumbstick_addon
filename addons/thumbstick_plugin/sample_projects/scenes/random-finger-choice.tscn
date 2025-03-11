@@ -1,12 +1,58 @@
-[gd_scene load_steps=3 format=3 uid="uid://b4pc5hwqooo0o"]
+[gd_scene load_steps=9 format=3 uid="uid://b4pc5hwqooo0o"]
 
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_FingerChoiceManager.gd" id="1_jtj3h"]
+[ext_resource type="PackedScene" uid="uid://8skifg2uq8yj" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/pointer_color.tscn" id="2_axa5y"]
 [ext_resource type="PackedScene" uid="uid://b6j27wv1bqel7" path="res://addons/thumbstick_plugin/plugin/controllers/multitouch_controller.tscn" id="2_vgney"]
+[ext_resource type="Texture2D" uid="uid://bktduuc66312k" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/square4x4.png" id="3_ey13x"]
+[ext_resource type="Shader" path="res://addons/thumbstick_plugin/sample_projects/shaders/background-hole.gdshader" id="3_ffs46"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_BackgroundHoleSetter.gd" id="5_0pprm"]
 
-[node name="Random-finger-choice" type="Node2D"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q7qw7"]
+shader = ExtResource("3_ffs46")
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/radius = 1.0
+shader_parameter/bg_tint = Color(1, 1, 1, 1)
+
+[sub_resource type="Curve" id="Curve_u4v2t"]
+bake_resolution = 64
+_data = [Vector2(0, 1), 0.0, -2.833, 0, 0, Vector2(1, 0.035), 0.2, 0.0, 0, 0]
+point_count = 2
+metadata/_snap_enabled = true
+
+[node name="Random-finger-choice" type="Node2D" node_paths=PackedStringArray("_focuser", "_countdown_text")]
 script = ExtResource("1_jtj3h")
+_display_pointer_pref = ExtResource("2_axa5y")
+_colors = Array[Color]([Color(0, 0.639216, 1, 1), Color(0.89088, 0.14367, 0.141952, 1), Color(0.203922, 0.956863, 0, 1), Color(0.952941, 0.956863, 0.196078, 1), Color(0.607843, 0, 0.988235, 1), Color(0.898039, 0.513726, 0, 1), Color(0.909804, 0, 0.917647, 1), Color(0.117647, 0.945098, 0.917647, 1)])
+_focuser = NodePath("Background")
+_countdown_text = NodePath("Controller/V Align/Countdowner")
+
+[node name="Background" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_q7qw7")
+position = Vector2(270, 480)
+scale = Vector2(1000, 1000)
+texture = ExtResource("3_ey13x")
+script = ExtResource("5_0pprm")
+_tweener = SubResource("Curve_u4v2t")
 
 [node name="Controller" type="CanvasLayer" parent="."]
 
-[node name="Multitouch Controller" parent="Controller" instance=ExtResource("2_vgney")]
+[node name="Multitouch Controller" parent="Controller" node_paths=PackedStringArray("control_target_node") instance=ExtResource("2_vgney")]
+_max_touch_amount = 8
+start_trigger_threshold = 8.0
 _tap_trigger_enabled = false
+control_target_node = NodePath("../..")
+
+[node name="V Align" type="VBoxContainer" parent="Controller"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Countdowner" type="RichTextLabel" parent="Controller/V Align"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 176
+bbcode_enabled = true
+text = "[wave][center]%s[/center][/wave]"
+fit_content = true

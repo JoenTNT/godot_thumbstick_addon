@@ -396,14 +396,14 @@ func _on_touch_released(index: int, point: Vector2) -> void:
 	_temp_touch = _cached_touches[index];
 	_temp_time_elapsed = Time.get_unix_time_from_system() - _temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT];
 	if _temp_time_elapsed < _cancel_tap_threshold:
-		_on_tapped_data.figner_index = index;
+		_on_tapped_data.finger_index = index;
 		_on_tapped_data.touch_amount = _current_touch_count;
 		_on_tapped_data.tap_position = _temp_touch[CACHE_KEY_TOUCH_START_POSITION];
 		if control_target_node != null:
 			if control_target_node.has_method(_on_touch_tap_method_name):
 				control_target_node.call(_on_touch_tap_method_name, _on_tapped_data);
 		on_touch_tap.emit(_on_tapped_data);
-	_on_released_data.figner_index = index;
+	_on_released_data.finger_index = index;
 	_on_released_data.touch_amount = _current_touch_count;
 	_on_released_data.latest_position = _temp_touch[CACHE_KEY_TOUCH_POSITION];
 	if control_target_node != null:
