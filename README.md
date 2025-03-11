@@ -74,3 +74,20 @@ You can completely manually customize yourself by editing or duplicating presets
 </div>
 
 ---
+---
+# PATCH LOGS
+
+```
+### Version 1.1.0 ###
+- Added a single scripted Multitouch Controller
+- Added Sample Project "Finger Choice"
+- IMPORTANT: Parameter events are now using custom class arguments
+  - For those who installed previous version will have some minor changes
+  - Example: on_pressed(press_position: Vector2) -> on_pressed(args: JoystickOnPressed)
+```
+
+```
+### Version 1.0.3 ###
+- Initial Released for Godot 4.3
+- Added Joystick Controller
+```
