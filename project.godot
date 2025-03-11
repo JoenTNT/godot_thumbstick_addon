@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Thumbstick"
 config/description="A Single Scripted and (yet) most convenient mobile controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy mobile controller setup validation."
-config/version="1.2.0"
+config/version="1.1.0"
 run/main_scene="res://addons/thumbstick_plugin/sample_projects/scenes/random-finger-choice.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 config/icon="res://addons/thumbstick_plugin/plugin/plugin_icon.png"
