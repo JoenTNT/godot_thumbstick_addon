@@ -1,5 +1,5 @@
 @tool
-class_name UI_TouchSurfaceController extends Control
+class_name UI_MultiTouchController extends Control
 
 # TODO: Finish the Prototype.
 ## Called when touch pressed on screen.
@@ -18,6 +18,10 @@ signal on_touch_tap(args: MultiTouchOnTap);
 ## Called when touch has been released.
 ## It is recommended to use cached touch owner index to track each touches.
 signal on_touch_released(args: MultiTouchOnReleased);
+
+## Called if maximum touch property value was changed.
+## If the setting condition invalid, the event will not be called.
+signal on_touch_max_amount_changed(args: MultiTouchOnMaxChanged);
 
 # Constant aliases.
 const ASSETS_PATH = "res://addons/thumbstick_plugin/plugin/assets/";
@@ -47,13 +51,20 @@ const DEFAULT_TRIGGER_FUNCTIONS: Dictionary = {
 	"on_pressed_method": "on_pressed",
 	"on_released_method": "on_released",
 	"on_tap_method": "on_tap",
+	"on_max_touch_amount_method": "on_max_touch_changed",
 };
 
 # Properties.
 ## Maximum of touches iat the same timw is enabled.
+## Set this equal to zero to disable the controller.
 var _max_touch_amount: int = DEFAULT_MAX_TOUCHES:
 	set(touch_amount):
-		if touch_amount <= 0: touch_amount = 1;
+		if touch_amount < 0:
+			print("[color=FDD303]Warning: Setting amount cannot be less than zero, abort the process.");
+			return;
+		elif touch_amount == _max_touch_amount:
+			print("[color=FDD303]Warning: Setting the same touch amount, abort the process.");
+			return;
 		_on_max_touch_amount_changed(_max_touch_amount, touch_amount);
 		_max_touch_amount = touch_amount;
 ## Move touch by distance in screen space to start trigger input.
@@ -70,6 +81,9 @@ var _tap_trigger_enabled: bool = false:
 var _cancel_tap_threshold: float = DEFAULT_CANCEL_TAP_THRESHOLD;
 ## Disable controller state status.
 var _is_disabled: bool = false;
+## If this is [b]True[/b], when maximum touch amount changed,
+## then it removes all the exceeding touch index immediately.
+var _remove_exceeded_touch: bool = false;
 
 # Controlling target.
 ## Once it is filled, all methods inside the node will be called.
@@ -82,6 +96,8 @@ var _on_touch_dragged_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_dragge
 var _on_touch_released_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_released_method"];
 ## Calling method on tap ([color=FE861A][b]Control Target Node[/b][/color] must be filled)
 var _on_touch_tap_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_tap_method"];
+## Calling method on max touch changed ([color=FE861A][b]Control Target Node[/b][/color] must be filled)
+var _on_max_touch_amount_changed_method_name: String = DEFAULT_TRIGGER_FUNCTIONS["on_max_touch_amount_method"];
 
 # Debugger.
 ## Open debug mode, only works in editor.
@@ -114,6 +130,7 @@ var _editor_warnings: bool = true;
 @onready var _on_dragged_data: MultiTouchOnDragged = MultiTouchOnDragged.new();
 @onready var _on_released_data: MultiTouchOnReleased = MultiTouchOnReleased.new();
 @onready var _on_tapped_data: MultiTouchOnTap = MultiTouchOnTap.new();
+@onready var _on_max_touch_changed_data: MultiTouchOnMaxChanged = MultiTouchOnMaxChanged.new();
 var _current_touch_count: int = 0;
 var _cached_touches: Dictionary = {};
 var _temp_touch: Dictionary;
@@ -127,6 +144,7 @@ var _temp_touch_text_hint_pos: Vector2;
 var _gizmos_color: Color;
 var _gizmos_color_when_trigger: Color;
 var _running_in_editor: bool = false;
+var _is_ready: bool = false;
 
 #region Property Drawer
 func _get_property_list() -> Array[Dictionary]:
@@ -150,6 +168,11 @@ func _get_property_list() -> Array[Dictionary]:
 		"usage": PROPERTY_USAGE_SUBGROUP,
 	}, {
 		"name": &"_tap_trigger_enabled",
+		"type": TYPE_BOOL,
+		"hint": PROPERTY_HINT_NONE,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_remove_exceeded_touch",
 		"type": TYPE_BOOL,
 		"hint": PROPERTY_HINT_NONE,
 		"usage": PROPERTY_USAGE_DEFAULT,
@@ -179,6 +202,10 @@ func _get_property_list() -> Array[Dictionary]:
 		"usage": PROPERTY_USAGE_DEFAULT,
 	}, {
 		"name": &"_on_touch_released_method_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_DEFAULT,
+	}, {
+		"name": &"_on_max_touch_amount_changed_method_name",
 		"type": TYPE_STRING,
 		"usage": PROPERTY_USAGE_DEFAULT,
 	}]);
@@ -246,6 +273,7 @@ func _property_can_revert(property: StringName) -> bool:
 	match (property):
 		&"_max_touch_amount": return _max_touch_amount != DEFAULT_MAX_TOUCHES;
 		&"_tap_trigger_enabled": return true;
+		&"_remove_exceeded_touch": return true;
 		&"_cancel_tap_threshold": return _cancel_tap_threshold != DEFAULT_CANCEL_TAP_THRESHOLD;
 		&"start_trigger_threshold": return start_trigger_threshold != DEFAULT_START_TRIGGER_THRESHOLD;
 		&"control_target_node": return control_target_node != null;
@@ -253,6 +281,7 @@ func _property_can_revert(property: StringName) -> bool:
 		&"_on_touch_dragged_method_name": return _on_touch_dragged_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_dragged_method"];
 		&"_on_touch_released_method_name": return _on_touch_released_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_released_method"];
 		&"_on_touch_tap_method_name": return _on_touch_tap_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_tap_method"];
+		&"_on_max_touch_amount_changed_method_name": return _on_max_touch_amount_changed_method_name != DEFAULT_TRIGGER_FUNCTIONS["on_max_touch_amount_method"];
 		&"_debug_mode": return true;
 		&"_visualize_gizmos": return true;
 		&"_gizmos_pretap_trigger_color": return _gizmos_pretap_trigger_color != DEFAULT_GIZMOS_PRETAP_COLOR;
@@ -268,6 +297,7 @@ func _property_get_revert(property: StringName) -> Variant:
 	match (property):
 		&"_max_touch_amount": return DEFAULT_MAX_TOUCHES;
 		&"_tap_trigger_enabled": return false;
+		&"_remove_exceeded_touch": return false;
 		&"_cancel_tap_threshold": return DEFAULT_CANCEL_TAP_THRESHOLD;
 		&"start_trigger_threshold": return DEFAULT_START_TRIGGER_THRESHOLD;
 		&"control_target_node": return null;
@@ -275,6 +305,7 @@ func _property_get_revert(property: StringName) -> Variant:
 		&"_on_touch_dragged_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_dragged_method"];
 		&"_on_touch_released_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_released_method"];
 		&"_on_touch_tap_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_tap_method"];
+		&"_on_max_touch_amount_changed_method_name": return DEFAULT_TRIGGER_FUNCTIONS["on_max_touch_amount_method"];
 		&"_debug_mode": return false;
 		&"_visualize_gizmos": return false;
 		&"_gizmos_pretap_trigger_color": return DEFAULT_GIZMOS_PRETAP_COLOR;
@@ -288,6 +319,7 @@ func _property_get_revert(property: StringName) -> Variant:
 #endregion
 
 func _ready() -> void:
+	_is_ready = true;
 	_running_in_editor = Engine.is_editor_hint();
 	if _running_in_editor: if !_editor_warnings: return;
 	var mft: bool = ProjectSettings.get_setting(MOUSE_FROM_TOUCH_SETTING);
@@ -356,6 +388,7 @@ func _draw() -> void:
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
 
 func _input(event: InputEvent) -> void:
+	if _max_touch_amount == 0: return;
 	_running_in_editor = Engine.is_editor_hint();
 	if _running_in_editor: return;
 	_temp_unix_time_now = Time.get_unix_time_from_system();
@@ -393,7 +426,9 @@ func _on_touch_pressed(index: int, point: Vector2) -> void:
 	on_touch_pressed.emit(_on_pressed_data);
 
 func _on_touch_released(index: int, point: Vector2) -> void:
-	_temp_touch = _cached_touches[index];
+	if !_temp_touch[CACHE_KEY_IS_PRESSED]: return;
+	_temp_touch[CACHE_KEY_IS_PRESSED] = false;
+	_temp_touch[CACHE_KEY_IS_TRIGGERED] = false;
 	_temp_time_elapsed = Time.get_unix_time_from_system() - _temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT];
 	if _temp_time_elapsed < _cancel_tap_threshold:
 		_on_tapped_data.finger_index = index;
@@ -410,7 +445,6 @@ func _on_touch_released(index: int, point: Vector2) -> void:
 		if control_target_node.has_method(_on_touch_released_method_name):
 			control_target_node.call(_on_touch_released_method_name, _on_released_data);
 	on_touch_released.emit(_on_released_data);
-	_cached_touches.erase(index);
 
 func _on_touch_drag(e: InputEventScreenDrag) -> void:
 	_temp_touch = _cached_touches.get_or_add(e.index, {});
@@ -445,13 +479,30 @@ func _on_touch_triggered(index: int, point: Vector2) -> void:
 ## Clear all touch temporary data from caches.
 func _clear_caches() -> void: _cached_touches.clear();
 
-# TODO: Handle max touch trigger amount changes in runtime.
 func _on_max_touch_amount_changed(old_amount: int, new_amount: int) -> void:
-	if old_amount == new_amount: return; # No need to be processed if not changed.
+	if !_is_ready: return;
+	_on_max_touch_changed_data.old_amount = old_amount;
+	_on_max_touch_changed_data.new_amount = new_amount;
+	_on_max_touch_changed_data.touch_triggered = _current_touch_count;
 	if old_amount > new_amount: # Case if reducing touch amount.
-		pass;
-	else: # Case if increasing amount of touches.
-		pass;
+		var sz: int = _cached_touches.size();
+		if _remove_exceeded_touch && sz > new_amount:
+			for i in range(new_amount - 1, sz):
+				_temp_touch = _cached_touches[i];
+				_on_touch_released(i, _temp_touch[CACHE_KEY_TOUCH_POSITION]);
+	if control_target_node != null:
+		if control_target_node.has_method(_on_max_touch_amount_changed_method_name):
+			control_target_node.call(_on_max_touch_amount_changed_method_name, _on_max_touch_changed_data);
+	on_touch_max_amount_changed.emit(_on_max_touch_changed_data);
+
+func set_remove_exceeding_touches(should_remove: bool) -> void:
+	_remove_exceeded_touch = should_remove;
+
+func set_max_touch_amount(amount: int) -> void:
+	_max_touch_amount = amount;
+
+func get_max_touch_amount() -> int:
+	return _max_touch_amount;
 
 func get_current_touch_count() -> int:
 	return _current_touch_count;

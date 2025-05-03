@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://b4pc5hwqooo0o"]
+[gd_scene load_steps=13 format=3 uid="uid://b4pc5hwqooo0o"]
 
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_FingerChoiceManager.gd" id="1_jtj3h"]
 [ext_resource type="PackedScene" uid="uid://8skifg2uq8yj" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/pointer_color.tscn" id="2_axa5y"]
@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://bktduuc66312k" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/square4x4.png" id="3_ey13x"]
 [ext_resource type="Shader" path="res://addons/thumbstick_plugin/sample_projects/shaders/background-hole.gdshader" id="3_ffs46"]
 [ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_BackgroundHoleSetter.gd" id="5_0pprm"]
+[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/UI_SAMPLE_PlayerCountEdit.gd" id="7_4u60v"]
+[ext_resource type="Shader" path="res://addons/thumbstick_plugin/sample_projects/shaders/triangle.gdshader" id="8_6ndcl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_q7qw7"]
 shader = ExtResource("3_ffs46")
@@ -18,6 +20,16 @@ bake_resolution = 64
 _data = [Vector2(0, 1), 0.0, -2.833, 0, 0, Vector2(1, 0.035), 0.2, 0.0, 0, 0]
 point_count = 2
 metadata/_snap_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hykry"]
+shader = ExtResource("8_6ndcl")
+shader_parameter/height = 0.895
+shader_parameter/x_slide = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a3lhq"]
+shader = ExtResource("8_6ndcl")
+shader_parameter/height = 1.0
+shader_parameter/x_slide = 0.0
 
 [node name="Random-finger-choice" type="Node2D" node_paths=PackedStringArray("_focuser", "_countdown_text")]
 script = ExtResource("1_jtj3h")
@@ -40,7 +52,9 @@ _tweener = SubResource("Curve_u4v2t")
 _max_touch_amount = 8
 start_trigger_threshold = 8.0
 _tap_trigger_enabled = false
+_remove_exceeded_touch = false
 control_target_node = NodePath("../..")
+_on_max_touch_amount_changed_method_name = "on_max_touch_changed"
 
 [node name="V Align" type="VBoxContainer" parent="Controller"]
 anchors_preset = 15
@@ -54,5 +68,71 @@ alignment = 1
 layout_mode = 2
 theme_override_font_sizes/normal_font_size = 176
 bbcode_enabled = true
-text = "[wave][center]%s[/center][/wave]"
+text = "[wave amp=100 freq=5][center]%s[/center][/wave]"
 fit_content = true
+
+[node name="Player Amount Edit" type="Control" parent="Controller" node_paths=PackedStringArray("_up_btn", "_down_btn", "_multitouch", "_text_hint")]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -88.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 136.0
+grow_horizontal = 0
+script = ExtResource("7_4u60v")
+_up_btn = NodePath("Up Arrow")
+_down_btn = NodePath("Down Arrow")
+_multitouch = NodePath("../Multitouch Controller")
+_text_hint = NodePath("V Align2/Hint Text")
+
+[node name="Up Arrow" type="TextureButton" parent="Controller/Player Amount Edit"]
+material = SubResource("ShaderMaterial_hykry")
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 24.0
+grow_horizontal = 2
+texture_normal = ExtResource("3_ey13x")
+texture_pressed = ExtResource("3_ey13x")
+texture_hover = ExtResource("3_ey13x")
+texture_disabled = ExtResource("3_ey13x")
+texture_focused = ExtResource("3_ey13x")
+stretch_mode = 0
+
+[node name="Down Arrow" type="TextureButton" parent="Controller/Player Amount Edit"]
+material = SubResource("ShaderMaterial_a3lhq")
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+rotation = 3.14159
+pivot_offset = Vector2(32, 12)
+texture_normal = ExtResource("3_ey13x")
+texture_pressed = ExtResource("3_ey13x")
+texture_hover = ExtResource("3_ey13x")
+texture_disabled = ExtResource("3_ey13x")
+texture_focused = ExtResource("3_ey13x")
+stretch_mode = 0
+
+[node name="V Align2" type="VBoxContainer" parent="Controller/Player Amount Edit"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Hint Text" type="RichTextLabel" parent="Controller/Player Amount Edit/V Align2"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center][b]%d[/b][/center]"
+fit_content = true
+scroll_active = false

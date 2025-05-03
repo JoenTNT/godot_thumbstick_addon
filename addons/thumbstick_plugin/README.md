@@ -1,17 +1,18 @@
 # Godot Thumbstick Plugin
 
 <div align=center>
-	<img src="https://img.shields.io/badge/version-%31%2E%30-green">
-	<a href="./LICENSE">
-		<img src="https://img.shields.io/badge/LICENSE-MIT-blue">
-	</a>
+    <img src="https://img.shields.io/badge/version-%31%2E%31-green">
+    <a href="./LICENSE">
+        <img src="https://img.shields.io/badge/LICENSE-MIT-blue">
+    </a>
 </div>
 
 ---
-> A Single Scripted and <ins>(yet) __most convenient__</ins> Mobile Screen Controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy setup validation.
+
+> A Single Scripted and <ins>(yet) __most convenient__</ins> most convenient mobile controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy mobile controller setup validation.
 
 <div align=center>
-	<img src=".\addons\thumbstick_plugin\sample_projects\screenshots\preview_joysticks.png">
+    <img src=".\addons\thumbstick_plugin\sample_projects\screenshots\preview_joysticks.png">
 </div>
 
 ## PLUGIN FEATURES
@@ -45,8 +46,8 @@ You can completely manually customize yourself by editing or duplicating presets
 ---
 
 <div align=center>
-	<img src=".\addons\thumbstick_plugin\sample_projects\screenshots\properties_1.png" height=410px/>
-	<img src=".\addons\thumbstick_plugin\sample_projects\screenshots\properties_2.png" height=410px/>
+    <img src=".\addons\thumbstick_plugin\sample_projects\screenshots\properties_1.png" height=410px/>
+    <img src=".\addons\thumbstick_plugin\sample_projects\screenshots\properties_2.png" height=410px/>
 </div>
 
 ---
@@ -54,17 +55,39 @@ You can completely manually customize yourself by editing or duplicating presets
 ### List of Properties
 
 1. `Mode`, Settings joystick behaviour between `Static`, `Dynamic`, or `Follow`.
-	- `Static`, Joystick doesn't move, it will always at dev setup position on screen.
-		- Additional Settings : `Extend Static Area Trigger`, Extends rectangular static touch trigger area for joystick static mode.
-	- `Dynamic`, Every time the joystick area is pressed, the joystick position is set on the touched position.
-	- `Follow`, When the finger moves outside the joystick area, the joystick will follow it.
-		- Additional Settings : `Follow Radius Tolerance`, Extra radius in joystick follow mode to prevents joystick display move until exceeds this tolerance.
+    - `Static`, Joystick doesn't move, it will always at dev setup position on screen.
+        - Additional Settings : `Extend Static Area Trigger`, Extends rectangular static touch trigger area for joystick static mode.
+    - `Dynamic`, Every time the joystick area is pressed, the joystick position is set on the touched position.
+    - `Follow`, When the finger moves outside the joystick area, the joystick will follow it.
+        - Additional Settings : `Follow Radius Tolerance`, Extra radius in joystick follow mode to prevents joystick display move until exceeds this tolerance.
 2. `Input Mode`, input mode based on direction input limitation.
-	- `Normal`, This is the default 2 axis direction joystick input.
-	- `Horizontal Only`, Joystick can be moved only horizontally.
-	- `Vertical Only`, Joystick can be moved only vertically.
+    - `Normal`, This is the default 2 axis direction joystick input.
+    - `Horizontal Only`, Joystick can be moved only horizontally.
+    - `Vertical Only`, Joystick can be moved only vertically.
 
 ---
 
-### **B. TOUCH MOTION SURFACE CONTROLLER**
-### [ \~\~ IN DEVELOPMENT \~\~ ]
+### **B. MULTITOUCH CONTROLLER**
+
+<div align=center>
+    <img src=".\addons\thumbstick_plugin\sample_projects\screenshots\multitouch_controller_preview.png"/>
+</div>
+
+---
+---
+# PATCH LOGS
+
+```
+### Version 1.1.0 ###
+- Added a single scripted Multitouch Controller
+- Added Sample Project "Finger Choice"
+- IMPORTANT: Parameter events are now using custom class arguments
+  - For those who installed previous version will have some minor changes
+  - Example: on_pressed(press_position: Vector2) -> on_pressed(args: JoystickOnPressed)
+```
+
+```
+### Version 1.0.3 ###
+- Initial Released for Godot 4.3
+- Added Joystick Controller
+```
