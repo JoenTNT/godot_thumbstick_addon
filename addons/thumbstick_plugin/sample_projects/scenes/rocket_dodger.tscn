@@ -223,6 +223,7 @@ scroll_active = false
 script = ExtResource("10_7i02q")
 
 [node name="Controller Canvas" type="CanvasLayer" parent="User Interface"]
+layer = 2
 
 [node name="Horizontal Joystick" parent="User Interface/Controller Canvas" node_paths=PackedStringArray("control_target_node") instance=ExtResource("2_4gru8")]
 anchors_preset = -1
@@ -248,6 +249,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0, 0, 0, 0.784314)
 
 [node name="Center Alignment" type="VBoxContainer" parent="User Interface/Game Over Canvas"]

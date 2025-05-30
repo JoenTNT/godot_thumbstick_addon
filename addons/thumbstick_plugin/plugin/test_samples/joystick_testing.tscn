@@ -11,6 +11,10 @@
 [node name="Normal Joystick" parent="CanvasLayer" instance=ExtResource("1_t843c")]
 anchors_preset = -1
 anchor_bottom = 0.333
+_debug_mode = true
+_visualize_gizmos = true
+_text_hint_color = Color(1, 1, 1, 1)
+_show_testing_info = false
 
 [node name="Horizontal Joystick" parent="CanvasLayer" instance=ExtResource("2_l7oxj")]
 anchors_preset = -1

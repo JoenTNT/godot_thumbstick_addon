@@ -1,4 +1,10 @@
-class_name SAMPLE_PlayerBall3DControl extends RigidBody3D
+# MIT License - Copyright (c) 2025 | JoenTNT
+# Permission is granted to use, copy, modify, and distribute this file
+# for any purpose with or without fee, provided the above notice is included.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+class_name SAMPLE_PlayerBall3DControl
+extends RigidBody3D
 
 # Properties.
 @export var torque_speed: float = 12.0;

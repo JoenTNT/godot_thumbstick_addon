@@ -1,3 +1,8 @@
+# MIT License - Copyright (c) 2025 | JoenTNT
+# Permission is granted to use, copy, modify, and distribute this file
+# for any purpose with or without fee, provided the above notice is included.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
 class_name SAMPLE_FingerChoiceManager
 extends Node2D
 
@@ -23,6 +28,7 @@ var _listed_fingers: Dictionary = {};
 var _temp_pos: Vector2 = Vector2.ZERO;
 var _index: int = 0;
 var _index_counter: Array[int] = [];
+var _max_finger: int = 0;
 var _countdown: float = 0.0;
 var _do_countdown: bool = false;
 var _choosen_index: int = 0;
@@ -54,8 +60,7 @@ func _process(delta: float) -> void:
 	_do_countdown = false;
 
 func on_pressed(args: MultiTouchOnPressed) -> void:
-	_index = args.finger_index;
-	if _index >= _colors.size(): return;
+	_index = args.finger_index % _colors.size();
 	_temp_pos = args.pressed_position;
 	_listed_fingers[_index][POSITION_KEY] = _temp_pos;
 	_listed_fingers[_index][IS_ACTIVE_KEY] = true;
@@ -68,8 +73,7 @@ func on_pressed(args: MultiTouchOnPressed) -> void:
 		_do_countdown = true;
 
 func on_released(args: MultiTouchOnReleased) -> void:
-	_index = args.finger_index;
-	if _index >= _colors.size(): return;
+	_index = args.finger_index % _colors.size();
 	_listed_fingers[_index][IS_ACTIVE_KEY] = false;
 	_listed_fingers[_index][MODEL_KEY].visible = false;
 	_listed_fingers[_index][MODEL_KEY].process_mode = PROCESS_MODE_DISABLED;
@@ -85,7 +89,9 @@ func on_released(args: MultiTouchOnReleased) -> void:
 		_countdown_text.text = "";
 
 func on_dragged(args: MultiTouchOnDragged) -> void:
-	_index = args.finger_index;
-	if _index >= _colors.size(): return;
+	_index = args.finger_index % _colors.size();
 	_listed_fingers[_index][POSITION_KEY] = args.drag_pos;
 	_listed_fingers[_index][MODEL_KEY].position = args.drag_pos;
+
+func on_max_touch_changed(args: MultiTouchOnMaxChanged) -> void:
+	pass;

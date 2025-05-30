@@ -1,5 +1,11 @@
+# MIT License - Copyright (c) 2025 | JoenTNT
+# Permission is granted to use, copy, modify, and distribute this file
+# for any purpose with or without fee, provided the above notice is included.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
 @tool
-class_name UI_JoystickController extends Control
+class_name UI_JoystickController
+extends Control
 
 # NOTE: Y Axis is inversed by default, up means minus.
 ## Event called when pointer touch begin only inside the area.
@@ -165,8 +171,8 @@ var _editor_warnings: bool = true;
 @onready var _root: Window = get_tree().root;
 @onready var _outer_joystick: TextureRect = $"Outer BG";
 @onready var _inner_joystick: TextureRect = $"Outer BG/Inner CTRL";
-@onready var _outer_origin_position: Vector2 = $"Outer BG".get_screen_position();
-@onready var _inner_origin_position: Vector2 = $"Outer BG/Inner CTRL".get_screen_position();
+@onready var _outer_origin_position: Vector2 = $"Outer BG".global_position;
+@onready var _inner_origin_position: Vector2 = $"Outer BG/Inner CTRL".global_position;
 @onready var _on_pressed_data: JoystickOnPressed = JoystickOnPressed.new();
 @onready var _on_tap_data: JoystickOnTap = JoystickOnTap.new();
 @onready var _on_trigger_data: JoystickOnTriggered = JoystickOnTriggered.new();
@@ -179,6 +185,7 @@ var _trigger_direction: Vector2 = Vector2.ZERO;
 var _trigger_magnitude: float = 0.0;
 var _outer_half_size: Vector2 = Vector2.ZERO;
 var _inner_half_size: Vector2 = Vector2.ZERO;
+var _gui_position_offset: Vector2 = Vector2.ZERO;
 
 var _expected_outer_position: Vector2 = Vector2.ZERO;
 var _expected_inner_position: Vector2 = Vector2.ZERO;
@@ -710,11 +717,12 @@ func _draw() -> void:
 		radius_hint = _inner_half_size.x + start_trigger_threshold;
 		draw_circle(mid_joystick_pos, radius_hint, _gizmos_color);
 
-func _input(event: InputEvent) -> void:
+func _gui_input(event: InputEvent) -> void:
 	_running_in_editor = Engine.is_editor_hint();
 	if _running_in_editor: return;
 	if joystick_disabled: return;
 	_unix_time_now = Time.get_unix_time_from_system();
+	_gui_position_offset = global_position;
 	if event is InputEventScreenTouch:
 		_input_screen_touch(event as InputEventScreenTouch, _unix_time_now);
 	elif event is InputEventScreenDrag:
@@ -724,7 +732,7 @@ func _input(event: InputEvent) -> void:
 	queue_redraw();
 
 func _input_screen_touch(e: InputEventScreenTouch, t: float) -> void:
-	_touch_position_cache = e.position;
+	_touch_position_cache = _gui_position_offset + e.position;
 	_inside_deadzone = true;
 	if e.pressed && _is_point_inside_area(_touch_position_cache):
 		if _is_pressed: return;
@@ -740,7 +748,7 @@ func _input_screen_touch(e: InputEventScreenTouch, t: float) -> void:
 func _input_screen_drag(e: InputEventScreenDrag, t: float) -> void:
 	if !_is_pressed: return;
 	if e.index != _touch_index: return;
-	_touch_position_cache = e.position;
+	_touch_position_cache = _gui_position_offset + e.position;
 	_control_elapsed_time = t - _elapsed_time_started;
 	if _is_triggered:
 		_on_trigger(_touch_position_cache, _control_elapsed_time);
@@ -769,6 +777,7 @@ func _on_pressed(start_point: Vector2, start_t: float) -> void:
 			_expected_inner_color = _base_color * _pressed_handle_tint;
 	# Call Event
 	_on_pressed_data.press_position = start_point;
+	_on_pressed_data.local_pressed_position = start_point - _gui_position_offset;
 	if control_target_node != null:
 		if control_target_node.has_method(_on_pressed_method_name):
 			control_target_node.call(_on_pressed_method_name, _on_pressed_data);
@@ -862,11 +871,13 @@ func _on_released(last_point: Vector2, last_elapsed: float) -> void:
 	# Call events.
 	if enable_tap_trigger && last_elapsed < cancel_tap_trigger_threshold:
 		_on_tap_data.tap_position = last_point;
+		_on_tap_data.local_tap_position = last_point - _gui_position_offset;
 		if control_target_node != null:
 			if control_target_node.has_method(_on_tap_method_name):
 				control_target_node.call(_on_tap_method_name, _on_tap_data);
 		on_tap.emit(_on_tap_data);
 	_on_released_data.release_position = last_point;
+	_on_released_data.local_release_position = last_point - _gui_position_offset;
 	_on_released_data.elapsed = last_elapsed;
 	if control_target_node != null:
 		if control_target_node.has_method(_on_released_method_name):

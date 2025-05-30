@@ -1,4 +1,10 @@
-class_name SAMPLE_Destroyer2D extends Area2D
+# MIT License - Copyright (c) 2025 | JoenTNT
+# Permission is granted to use, copy, modify, and distribute this file
+# for any purpose with or without fee, provided the above notice is included.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+class_name SAMPLE_Destroyer2D
+extends Area2D
 
 @export var spawner_container: SAMPLE_MeteorSpawner = null;
 

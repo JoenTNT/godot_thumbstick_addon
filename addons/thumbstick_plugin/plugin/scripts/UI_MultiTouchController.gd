@@ -1,5 +1,11 @@
+# MIT License - Copyright (c) 2025 | JoenTNT
+# Permission is granted to use, copy, modify, and distribute this file
+# for any purpose with or without fee, provided the above notice is included.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
 @tool
-class_name UI_MultiTouchController extends Control
+class_name UI_MultiTouchController
+extends Control
 
 # TODO: Finish the Prototype.
 ## Called when touch pressed on screen.
@@ -59,12 +65,13 @@ const DEFAULT_TRIGGER_FUNCTIONS: Dictionary = {
 ## Set this equal to zero to disable the controller.
 var _max_touch_amount: int = DEFAULT_MAX_TOUCHES:
 	set(touch_amount):
-		if touch_amount < 0:
-			print("[color=FDD303]Warning: Setting amount cannot be less than zero, abort the process.");
-			return;
-		elif touch_amount == _max_touch_amount:
-			print("[color=FDD303]Warning: Setting the same touch amount, abort the process.");
-			return;
+		if _is_ready:
+			if touch_amount < 0:
+				print("Warning: Setting amount cannot be less than zero, abort the process.");
+				return;
+			elif touch_amount == _max_touch_amount:
+				print("Warning: Setting the same touch amount, abort the process.");
+				return;
 		_on_max_touch_amount_changed(_max_touch_amount, touch_amount);
 		_max_touch_amount = touch_amount;
 ## Move touch by distance in screen space to start trigger input.
@@ -141,6 +148,9 @@ var _temp_dragged_magnitude: float;
 var _temp_unix_time_now: float = 0.0;
 var _temp_time_elapsed: float = 0.0;
 var _temp_touch_text_hint_pos: Vector2;
+var _gui_position_offset: Vector2;
+var _temp_touch_pos: Vector2;
+var _temp_dragged_pos: Vector2;
 var _gizmos_color: Color;
 var _gizmos_color_when_trigger: Color;
 var _running_in_editor: bool = false;
@@ -291,7 +301,7 @@ func _property_can_revert(property: StringName) -> bool:
 		&"_gizmos_text_hint_color": return _gizmos_text_hint_color != DEFAULT_GIZMOS_TEXT_COLOR;
 		&"_gizmos_text_hint_offset": return _gizmos_text_hint_offset != DEFAULT_GIZMOS_TEXT_HINT_OFFSET;
 		&"_editor_warnings": return true;
-		_: return true;
+		_: return false;
 
 func _property_get_revert(property: StringName) -> Variant:
 	match (property):
@@ -347,28 +357,33 @@ func _draw() -> void:
 	_gizmos_color = Color.AQUAMARINE;
 	_gizmos_color.a = 0.15;
 	draw_rect(Rect2(Vector2(0.0, 0.0), size), _gizmos_color);
+	var touch_pos: Vector2;
+	var start_pos: Vector2;
 	for k in _cached_touches.keys():
 		_temp_draw_touch = _cached_touches[k];
+		if not _temp_draw_touch[CACHE_KEY_IS_PRESSED]: continue;
+		touch_pos = _temp_draw_touch[CACHE_KEY_TOUCH_POSITION] - global_position;
 		if _temp_draw_touch[CACHE_KEY_IS_TRIGGERED]:
-			_temp_touch_text_hint_pos = _temp_draw_touch[CACHE_KEY_TOUCH_POSITION];
+			_temp_touch_text_hint_pos = touch_pos;
 			_gizmos_color_when_trigger = Color.CYAN;
 			_gizmos_color_when_trigger.a = 0.25;
 			_gizmos_color = _gizmos_active_trigger_color;
 			_gizmos_color.a = 0.3;
-			draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_POSITION], start_trigger_threshold, _gizmos_color);
+			draw_circle(touch_pos, start_trigger_threshold, _gizmos_color);
 		else:
-			_temp_touch_text_hint_pos = _temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION];
+			start_pos = _temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION] - global_position;
+			_temp_touch_text_hint_pos = start_pos;
 			_gizmos_color_when_trigger = Color.BLUE;
 			_gizmos_color_when_trigger.a = 0.25;
 			if _tap_trigger_enabled && _temp_draw_touch[CACHE_KEY_RUNNING_ELAPSED_TIME] < _cancel_tap_threshold:
 				_gizmos_color = _gizmos_pretap_trigger_color;
 				_gizmos_color.a = 0.3;
-				draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION], start_trigger_threshold, _gizmos_color);
+				draw_circle(start_pos, start_trigger_threshold, _gizmos_color);
 			else:
 				_gizmos_color = _gizmos_inactive_trigger_color;
 				_gizmos_color.a = 0.3;
-				draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_START_POSITION], start_trigger_threshold, _gizmos_color);
-		draw_circle(_temp_draw_touch[CACHE_KEY_TOUCH_POSITION], _gizmos_touch_hint_radius, _gizmos_color_when_trigger);
+				draw_circle(start_pos, start_trigger_threshold, _gizmos_color);
+		draw_circle(touch_pos, _gizmos_touch_hint_radius, _gizmos_color_when_trigger);
 		# Draw text information on screen.
 		_temp_touch_text_hint_pos += _gizmos_text_hint_offset;
 		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,
@@ -380,18 +395,18 @@ func _draw() -> void:
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
 		_temp_touch_text_hint_pos += Vector2(0.0, 14.0);
 		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,
-			"Position: {pos}".format({"pos": _temp_draw_touch[CACHE_KEY_TOUCH_POSITION]}),
+			"Position: {pos}".format({"pos": touch_pos}),
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
 		_temp_touch_text_hint_pos += Vector2(0.0, 14.0);
 		draw_string(ThemeDB.fallback_font, _temp_touch_text_hint_pos,
 			"Elapsed: %.3f" % _temp_draw_touch[CACHE_KEY_RUNNING_ELAPSED_TIME],
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, _gizmos_text_hint_color);
 
-func _input(event: InputEvent) -> void:
-	if _max_touch_amount == 0: return;
+func _gui_input(event: InputEvent) -> void:
 	_running_in_editor = Engine.is_editor_hint();
 	if _running_in_editor: return;
 	_temp_unix_time_now = Time.get_unix_time_from_system();
+	_gui_position_offset = global_position;
 	if event is InputEventScreenTouch:
 		_on_touch_input(event as InputEventScreenTouch);
 	if event is InputEventScreenDrag:
@@ -400,13 +415,14 @@ func _input(event: InputEvent) -> void:
 
 func _on_touch_input(e: InputEventScreenTouch) -> void:
 	_temp_touch = _cached_touches.get_or_add(e.index, {});
-	_temp_touch[CACHE_KEY_TOUCH_POSITION] = e.position;
+	_temp_touch_pos = e.position + _gui_position_offset;
+	_temp_touch[CACHE_KEY_TOUCH_POSITION] = _temp_touch_pos;
 	if _current_touch_count < _max_touch_amount && e.pressed:
 		_current_touch_count += 1;
-		_on_touch_pressed(e.index, e.position);
-		_temp_touch[CACHE_KEY_TOUCH_PREVIOUS_POSITION] = e.position;
+		_on_touch_pressed(e.index, _temp_touch_pos);
+		_temp_touch[CACHE_KEY_TOUCH_PREVIOUS_POSITION] = _temp_touch_pos;
 	elif not e.pressed:
-		_on_touch_released(e.index, e.position);
+		_on_touch_released(e.index, _temp_touch_pos);
 		_current_touch_count -= 1;
 
 func _on_touch_pressed(index: int, point: Vector2) -> void:
@@ -448,9 +464,10 @@ func _on_touch_released(index: int, point: Vector2) -> void:
 
 func _on_touch_drag(e: InputEventScreenDrag) -> void:
 	_temp_touch = _cached_touches.get_or_add(e.index, {});
-	_temp_touch[CACHE_KEY_TOUCH_POSITION] = e.position;
-	_on_touch_triggered(e.index, e.position);
-	_temp_touch[CACHE_KEY_TOUCH_PREVIOUS_POSITION] = e.position;
+	_temp_dragged_pos = e.position + _gui_position_offset;
+	_temp_touch[CACHE_KEY_TOUCH_POSITION] = _temp_dragged_pos;
+	_on_touch_triggered(e.index, _temp_dragged_pos);
+	_temp_touch[CACHE_KEY_TOUCH_PREVIOUS_POSITION] = _temp_dragged_pos;
 
 func _on_touch_triggered(index: int, point: Vector2) -> void:
 	_temp_dragged_direction = _temp_touch.get_or_add(CACHE_KEY_TOUCH_DRAGGED_DIRECTION, Vector2.ZERO);
