@@ -435,6 +435,7 @@ func _on_touch_pressed(index: int, point: Vector2) -> void:
 	_on_pressed_data.finger_index = index;
 	_on_pressed_data.touch_amount = _current_touch_count;
 	_on_pressed_data.pressed_position = _temp_touch[CACHE_KEY_TOUCH_START_POSITION];
+	_on_pressed_data.local_pressed_position = _on_pressed_data.pressed_position - _gui_position_offset;
 	# Call events.
 	if control_target_node != null:
 		if control_target_node.has_method(_on_touch_pressed_method_name):
@@ -448,16 +449,22 @@ func _on_touch_released(index: int, point: Vector2) -> void:
 	_temp_touch[CACHE_KEY_IS_TRIGGERED] = false;
 	_temp_time_elapsed = Time.get_unix_time_from_system() - _temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT];
 	if _temp_time_elapsed < _cancel_tap_threshold:
+		# Cached data.
 		_on_tapped_data.finger_index = index;
 		_on_tapped_data.touch_amount = _current_touch_count;
 		_on_tapped_data.tap_position = _temp_touch[CACHE_KEY_TOUCH_START_POSITION];
+		_on_tapped_data.local_tap_position = _on_tapped_data.tap_position - _gui_position_offset;
+		# Call events.
 		if control_target_node != null:
 			if control_target_node.has_method(_on_touch_tap_method_name):
 				control_target_node.call(_on_touch_tap_method_name, _on_tapped_data);
 		on_touch_tap.emit(_on_tapped_data);
+	# Cached data.
 	_on_released_data.finger_index = index;
 	_on_released_data.touch_amount = _current_touch_count;
 	_on_released_data.latest_position = _temp_touch[CACHE_KEY_TOUCH_POSITION];
+	_on_released_data.local_latest_position = _on_released_data.latest_position - _gui_position_offset;
+	# Call events.
 	if control_target_node != null:
 		if control_target_node.has_method(_on_touch_released_method_name):
 			control_target_node.call(_on_touch_released_method_name, _on_released_data);
@@ -489,7 +496,8 @@ func _on_touch_triggered(index: int, point: Vector2) -> void:
 	_on_dragged_data.finger_index = index;
 	_on_dragged_data.touch_amount = _current_touch_count;
 	_on_dragged_data.drag_pos = _temp_touch[CACHE_KEY_TOUCH_POSITION];
-	_on_dragged_data.drag_dir = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION];
+	_on_dragged_data.local_drag_pos = _on_dragged_data.drag_pos - _gui_position_offset;
+	_on_dragged_data.normal_drag_dir = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION];
 	_on_dragged_data.drag_magnitude = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE];
 	# Call events.
 	if control_target_node != null:

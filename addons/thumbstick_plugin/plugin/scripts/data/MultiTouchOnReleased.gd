@@ -11,4 +11,9 @@ var finger_index: int;
 
 ## Current counted amount of touches that is on screen.
 var touch_amount: int;
+
+## Global position of last finger point released from screen.
 var latest_position: Vector2;
+
+## Local position in gui space of last finger point released from screen.
+var local_latest_position: Vector2;

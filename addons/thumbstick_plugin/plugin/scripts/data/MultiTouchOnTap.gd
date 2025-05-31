@@ -11,4 +11,9 @@ var finger_index: int;
 
 ## Current counted amount of touches that is on screen.
 var touch_amount: int;
+
+## Tapped finger on screen global position.
 var tap_position: Vector2;
+
+## Tappedfinger on screen local position in gui space.
+var local_tap_position: Vector2;

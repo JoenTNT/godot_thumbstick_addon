@@ -12,6 +12,15 @@ var finger_index: int;
 ## Current counted amount of touches that is on screen. 
 ## The event does not called when the number of touches changed.
 var touch_amount: int;
+
+## Current dragging global position at.
 var drag_pos: Vector2;
-var drag_dir: Vector2;
+
+## Current dragging local position at gui space.
+var local_drag_pos: Vector2;
+
+## Dragging direction from previous point to current point which has been normalized.
+var normal_drag_dir: Vector2;
+
+## Magnitude distance between previous dragged position to current one.
 var drag_magnitude: float;
