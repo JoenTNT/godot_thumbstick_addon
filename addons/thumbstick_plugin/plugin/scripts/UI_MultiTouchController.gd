@@ -349,7 +349,8 @@ func _process(delta: float) -> void:
 	if _cached_touches.size() > 0:
 		for k in _cached_touches.keys():
 			_temp_touch = _cached_touches[k];
-			_temp_touch[CACHE_KEY_RUNNING_ELAPSED_TIME] = Time.get_unix_time_from_system() - _temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT];
+			if _temp_touch.has(CACHE_KEY_RUNNING_ELAPSED_TIME) && _temp_touch.has(CACHE_KEY_START_ELAPSED_TIME_AT):
+				_temp_touch[CACHE_KEY_RUNNING_ELAPSED_TIME] = Time.get_unix_time_from_system() - _temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT];
 		queue_redraw();
 
 func _draw() -> void:
@@ -361,7 +362,7 @@ func _draw() -> void:
 	var start_pos: Vector2;
 	for k in _cached_touches.keys():
 		_temp_draw_touch = _cached_touches[k];
-		if not _temp_draw_touch[CACHE_KEY_IS_PRESSED]: continue;
+		if !_temp_draw_touch.get_or_add(CACHE_KEY_IS_PRESSED, false): continue;
 		touch_pos = _temp_draw_touch[CACHE_KEY_TOUCH_POSITION] - global_position;
 		if _temp_draw_touch[CACHE_KEY_IS_TRIGGERED]:
 			_temp_touch_text_hint_pos = touch_pos;
@@ -418,14 +419,13 @@ func _on_touch_input(e: InputEventScreenTouch) -> void:
 	_temp_touch_pos = e.position + _gui_position_offset;
 	_temp_touch[CACHE_KEY_TOUCH_POSITION] = _temp_touch_pos;
 	if _current_touch_count < _max_touch_amount && e.pressed:
-		_current_touch_count += 1;
 		_on_touch_pressed(e.index, _temp_touch_pos);
 		_temp_touch[CACHE_KEY_TOUCH_PREVIOUS_POSITION] = _temp_touch_pos;
-	elif not e.pressed:
+	elif _current_touch_count > 0 && !e.pressed:
 		_on_touch_released(e.index, _temp_touch_pos);
-		_current_touch_count -= 1;
 
 func _on_touch_pressed(index: int, point: Vector2) -> void:
+	_current_touch_count += 1;
 	_temp_touch[CACHE_KEY_IS_PRESSED] = true;
 	_temp_touch[CACHE_KEY_IS_TRIGGERED] = false;
 	_temp_touch[CACHE_KEY_TOUCH_START_POSITION] = point;
@@ -435,6 +435,7 @@ func _on_touch_pressed(index: int, point: Vector2) -> void:
 	_on_pressed_data.finger_index = index;
 	_on_pressed_data.touch_amount = _current_touch_count;
 	_on_pressed_data.pressed_position = _temp_touch[CACHE_KEY_TOUCH_START_POSITION];
+	_on_pressed_data.local_pressed_position = _on_pressed_data.pressed_position - _gui_position_offset;
 	# Call events.
 	if control_target_node != null:
 		if control_target_node.has_method(_on_touch_pressed_method_name):
@@ -442,21 +443,28 @@ func _on_touch_pressed(index: int, point: Vector2) -> void:
 	on_touch_pressed.emit(_on_pressed_data);
 
 func _on_touch_released(index: int, point: Vector2) -> void:
-	if !_temp_touch[CACHE_KEY_IS_PRESSED]: return;
+	if !_temp_touch.get_or_add(CACHE_KEY_IS_PRESSED, false): return;
+	_current_touch_count -= 1;
 	_temp_touch[CACHE_KEY_IS_PRESSED] = false;
 	_temp_touch[CACHE_KEY_IS_TRIGGERED] = false;
 	_temp_time_elapsed = Time.get_unix_time_from_system() - _temp_touch[CACHE_KEY_START_ELAPSED_TIME_AT];
 	if _temp_time_elapsed < _cancel_tap_threshold:
+		# Cached data.
 		_on_tapped_data.finger_index = index;
 		_on_tapped_data.touch_amount = _current_touch_count;
 		_on_tapped_data.tap_position = _temp_touch[CACHE_KEY_TOUCH_START_POSITION];
+		_on_tapped_data.local_tap_position = _on_tapped_data.tap_position - _gui_position_offset;
+		# Call events.
 		if control_target_node != null:
 			if control_target_node.has_method(_on_touch_tap_method_name):
 				control_target_node.call(_on_touch_tap_method_name, _on_tapped_data);
 		on_touch_tap.emit(_on_tapped_data);
+	# Cached data.
 	_on_released_data.finger_index = index;
 	_on_released_data.touch_amount = _current_touch_count;
 	_on_released_data.latest_position = _temp_touch[CACHE_KEY_TOUCH_POSITION];
+	_on_released_data.local_latest_position = _on_released_data.latest_position - _gui_position_offset;
+	# Call events.
 	if control_target_node != null:
 		if control_target_node.has_method(_on_touch_released_method_name):
 			control_target_node.call(_on_touch_released_method_name, _on_released_data);
@@ -464,6 +472,8 @@ func _on_touch_released(index: int, point: Vector2) -> void:
 
 func _on_touch_drag(e: InputEventScreenDrag) -> void:
 	_temp_touch = _cached_touches.get_or_add(e.index, {});
+	if !_temp_touch.has(CACHE_KEY_IS_PRESSED): return;
+	if !_temp_touch[CACHE_KEY_IS_PRESSED]: return;
 	_temp_dragged_pos = e.position + _gui_position_offset;
 	_temp_touch[CACHE_KEY_TOUCH_POSITION] = _temp_dragged_pos;
 	_on_touch_triggered(e.index, _temp_dragged_pos);
@@ -475,7 +485,7 @@ func _on_touch_triggered(index: int, point: Vector2) -> void:
 	if CACHE_KEY_IS_TRIGGERED not in _temp_touch:
 		_temp_touch[CACHE_KEY_IS_TRIGGERED] = false;
 	if not _temp_touch[CACHE_KEY_IS_TRIGGERED]:
-		_temp_start_point = _temp_touch.get_or_add(CACHE_KEY_TOUCH_START_POSITION);
+		_temp_start_point = _temp_touch.get_or_add(CACHE_KEY_TOUCH_START_POSITION, point);
 		if _temp_start_point.distance_to(point) < start_trigger_threshold: return;
 		_temp_touch[CACHE_KEY_IS_TRIGGERED] = true;
 	_temp_dragged_direction = _temp_touch[CACHE_KEY_TOUCH_POSITION] - _temp_touch[CACHE_KEY_TOUCH_PREVIOUS_POSITION];
@@ -486,7 +496,8 @@ func _on_touch_triggered(index: int, point: Vector2) -> void:
 	_on_dragged_data.finger_index = index;
 	_on_dragged_data.touch_amount = _current_touch_count;
 	_on_dragged_data.drag_pos = _temp_touch[CACHE_KEY_TOUCH_POSITION];
-	_on_dragged_data.drag_dir = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION];
+	_on_dragged_data.local_drag_pos = _on_dragged_data.drag_pos - _gui_position_offset;
+	_on_dragged_data.normal_drag_dir = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION];
 	_on_dragged_data.drag_magnitude = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE];
 	# Call events.
 	if control_target_node != null:

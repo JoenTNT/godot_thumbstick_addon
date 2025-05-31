@@ -11,10 +11,10 @@ void fragment() {
 	float alpha = 0.0;
 	float fixed_top = -height;
 	float x_tip = uv.x - x_slide;
-	
+
 	if (y > fixed_top && y < 1.0 && abs(x_tip * 2.0) < (y - fixed_top)) {
         alpha = 1.0;
     }
-	
+
 	COLOR = vec4(col.r, col.g, col.b, alpha);
 }

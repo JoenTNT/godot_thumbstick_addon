@@ -12,6 +12,7 @@
     <br>
     <img src="https://img.shields.io/badge/GD_Script-468cbf">
     <img src="https://img.shields.io/badge/4.3-468cbf">
+    <img src="https://img.shields.io/badge/4.4-468cbf">
 </div>
 
 ---
@@ -24,9 +25,9 @@
 
 ## PLUGIN FEATURES
 
-- **Virtual Joystick**, an usual mobile controller, just drag and drop into your scene (Presets include *`Normal`*, *`Horizontal Only`*, and *`Vertical Only`*).
-- **Multitouch**, an area where it detects multiple touches and motions.
-- **Point & Snap**, take two point (COMING SOON).
+- [**Virtual Joystick**](#a-virtual-joysticks-controller), an usual mobile controller, just drag and drop into your scene (Presets include *`Normal`*, *`Horizontal Only`*, and *`Vertical Only`*).
+- [**Multitouch**](#b-multitouch-controller), an area where it detects multiple touches and motions.
+- **Point & Snap**, a simple press the point, drag, and snap to other points (COMING SOON).
 - **Coloring Style**, changing color based on controller actions.
 - **Quick Debug Gizmos**, immediately visualize touch screen controller setup, just activate *`Debug Mode`* in inspector property.
 - **Quick Target Controller Setup**, insert your player node into *`Control Target Node`* property and assign all functions.
@@ -51,7 +52,7 @@ You can either download via **Asset Library** available in Godot Engine, or Down
 
 Normally determined as a single circular controller that can be moved in 2 axis direction placed in user interface screen. It only detects one finger touch and will ignore other touch impacting the control area.
 
-You can completely manually customize yourself by editing or duplicating presets available in `addons` -> `thumbstick_plugin` -> `plugin` -> `joysticks` folder.
+You can manually customize yourself by editing or duplicating presets available in `addons` -> `thumbstick_plugin` -> `plugin` -> `controllers` folder.
 
 ---
 
@@ -87,17 +88,24 @@ You can completely manually customize yourself by editing or duplicating presets
 
 > A single scripted controller that accepts multiple touches.
 
+One single control node can handle multiple touch control, that's the definition for this module. Each touch will have it's finger index as an identifier. You can limit and manipulate how much touches will be process in gameplay.
+
+<div align=center>
+    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/finger-picker-test-preview.png"/>
+</div>
+
+You can manually customize yourself by editing or duplicating presets available in `addons` -> `thumbstick_plugin` -> `plugin` -> `controllers` folder.
+
 ---
 # PATCH LOGS
 
 ```
-### Version 1.2.0 [IN PROGRESS] ###
-```
-
-```
-### Version 1.1.2 ###
+### Version 1.2.0 ###
+- Fixed Multitouch Controller Minor Bugs.
+- Updated Multitouch Controller, you can now manipulate maximum finger amount in runtime.
 - All event arguments now contains global and local position.
 - Controller is completely GUI-based, you can now block the controller using UI element.
+- Has been tested and now the plugin supported in Godot 4.4.
 ```
 
 ```
