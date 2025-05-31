@@ -1,9 +1,9 @@
 [gd_scene load_steps=11 format=3 uid="uid://bpplhw1xggw76"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PhysicalTouchColliderEffect.gd" id="1_5xpq7"]
+[ext_resource type="Script" uid="uid://bo4t2bpfiwp5n" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PhysicalTouchColliderEffect.gd" id="1_5xpq7"]
 [ext_resource type="PackedScene" uid="uid://bn2b4j8n5wv2t" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/pebble.tscn" id="2_nlpqn"]
 [ext_resource type="PackedScene" uid="uid://dwn5r5yuoqyjw" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/touch_collider.tscn" id="2_ukw16"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PebbleSpawner.gd" id="2_xwby6"]
+[ext_resource type="Script" uid="uid://c2sdgmg6ndotu" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_PebbleSpawner.gd" id="2_xwby6"]
 [ext_resource type="PackedScene" uid="uid://b6j27wv1bqel7" path="res://addons/thumbstick_plugin/plugin/controllers/multitouch_controller.tscn" id="3_byaqh"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h8qu8"]

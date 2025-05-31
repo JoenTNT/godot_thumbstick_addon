@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://nxen3u7u5wgs"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Meteor2D.gd" id="1_c8rca"]
+[ext_resource type="Script" uid="uid://bfvvswadg5egy" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Meteor2D.gd" id="1_c8rca"]
 [ext_resource type="Texture2D" uid="uid://bk7tpff3dadmj" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/meteor/meteor1.png" id="1_gvn7a"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kcst7"]
