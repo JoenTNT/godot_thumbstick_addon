@@ -49,15 +49,18 @@ _tweener = SubResource("Curve_u4v2t")
 [node name="Controller" type="CanvasLayer" parent="."]
 layer = 5
 
-[node name="Multitouch Controller" parent="Controller" instance=ExtResource("2_vgney")]
+[node name="Multitouch Controller" parent="Controller" node_paths=PackedStringArray("control_target_node") instance=ExtResource("2_vgney")]
 physics_interpolation_mode = 0
 anchors_preset = -1
 anchor_left = 0.05
 anchor_top = 0.025
 anchor_right = 0.95
 anchor_bottom = 0.975
-mouse_force_pass_scroll_events = false
 mouse_default_cursor_shape = 2
+_max_touch_amount = 0
+start_trigger_threshold = 8.0
+_tap_trigger_enabled = false
+control_target_node = NodePath("../..")
 
 [node name="V Align" type="VBoxContainer" parent="Controller"]
 anchors_preset = 15
