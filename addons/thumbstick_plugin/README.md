@@ -1,24 +1,32 @@
-# Godot Thumbstick Plugin
+# Godot Thumbstick Plugin - Easy Mobile Controller Module
 
 <div align=center>
-	<img src="https://img.shields.io/badge/version-%31%2E%31-green">
-	<a href="./LICENSE">
-		<img src="https://img.shields.io/badge/LICENSE-MIT-blue">
-	</a>
+	<img src="/addons/thumbstick_plugin/plugin/plugin_icon.png" style="width: 128px; height: auto;">
+</div>
+
+<div align=center>
+    <img src="https://img.shields.io/badge/version-%31%2E%31-green">
+    <a href="./LICENSE">
+        <img src="https://img.shields.io/badge/LICENSE-MIT-blue">
+    </a>
+    <br>
+    <img src="https://img.shields.io/badge/GD_Script-468cbf">
+    <img src="https://img.shields.io/badge/4.3-468cbf">
 </div>
 
 ---
 
-> A Single Scripted and <ins>(yet) __most convenient__</ins> most convenient mobile controller setup element and connector. This plugin included presets and detailed debug informations mainly used for easy mobile controller setup validation.
+> A __Single Scripted__ and <ins>(yet) __most convenient__</ins> mobile controller setup element and connector. This plugin included presets and detailed debug information mainly used for easy mobile controller setup validation.
 
 <div align=center>
-	<img src=".\addons\thumbstick_plugin\sample_projects\screenshots\preview_joysticks.png">
+    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/preview_joysticks.png">
 </div>
 
 ## PLUGIN FEATURES
 
-- **Virtual Joystick**, just drag and drop into your scene (Presets include *`Normal`*, *`Horizontal Only`*, and *`Vertical Only`*).
-- **Touch Motion Surface**, an area where it detects multiple touches and motions (COMING SOON).
+- **Virtual Joystick**, an usual mobile controller, just drag and drop into your scene (Presets include *`Normal`*, *`Horizontal Only`*, and *`Vertical Only`*).
+- **Multitouch**, an area where it detects multiple touches and motions.
+- **Point & Snap**, take two point (COMING SOON).
 - **Coloring Style**, changing color based on controller actions.
 - **Quick Debug Gizmos**, immediately visualize touch screen controller setup, just activate *`Debug Mode`* in inspector property.
 - **Quick Target Controller Setup**, insert your player node into *`Control Target Node`* property and assign all functions.
@@ -39,6 +47,8 @@ You can either download via **Asset Library** available in Godot Engine, or Down
 
 ### **A. VIRTUAL JOYSTICKS CONTROLLER**
 
+> A single scripted mobile joystick controller.
+
 Normally determined as a single circular controller that can be moved in 2 axis direction placed in user interface screen. It only detects one finger touch and will ignore other touch impacting the control area.
 
 You can completely manually customize yourself by editing or duplicating presets available in `addons` -> `thumbstick_plugin` -> `plugin` -> `joysticks` folder.
@@ -46,36 +56,54 @@ You can completely manually customize yourself by editing or duplicating presets
 ---
 
 <div align=center>
-	<img src=".\addons\thumbstick_plugin\sample_projects\screenshots\properties_1.png" height=410px/>
-	<img src=".\addons\thumbstick_plugin\sample_projects\screenshots\properties_2.png" height=410px/>
+    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/properties_1.png" height=410px/>
+    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/properties_2.png" height=410px/>
 </div>
 
 ---
 
 ### List of Properties
 
-1. `Mode`, Settings joystick behaviour between `Static`, `Dynamic`, or `Follow`.
-	- `Static`, Joystick doesn't move, it will always at dev setup position on screen.
-		- Additional Settings : `Extend Static Area Trigger`, Extends rectangular static touch trigger area for joystick static mode.
-	- `Dynamic`, Every time the joystick area is pressed, the joystick position is set on the touched position.
-	- `Follow`, When the finger moves outside the joystick area, the joystick will follow it.
-		- Additional Settings : `Follow Radius Tolerance`, Extra radius in joystick follow mode to prevents joystick display move until exceeds this tolerance.
+1. `Mode`, Settings joystick behavior between `Static`, `Dynamic`, or `Follow`.
+    - `Static`, Joystick doesn't move, it will always at dev setup position on screen.
+        - Additional Settings : `Extend Static Area Trigger`, Extends rectangular static touch trigger area for joystick static mode.
+    - `Dynamic`, Every time the joystick area is pressed, the joystick position is set on the touched position.
+    - `Follow`, When the finger moves outside the joystick area, the joystick will follow it.
+        - Additional Settings : `Follow Radius Tolerance`, Extra radius in joystick follow mode to prevents joystick display move until exceeds this tolerance.
 2. `Input Mode`, input mode based on direction input limitation.
-	- `Normal`, This is the default 2 axis direction joystick input.
-	- `Horizontal Only`, Joystick can be moved only horizontally.
-	- `Vertical Only`, Joystick can be moved only vertically.
+    - `Normal`, This is the default 2 axis direction joystick input.
+    - `Horizontal Only`, Joystick can be moved only horizontally.
+    - `Vertical Only`, Joystick can be moved only vertically.
 
 ---
 
 ### **B. MULTITOUCH CONTROLLER**
 
 <div align=center>
-	<img src=".\addons\thumbstick_plugin\sample_projects\screenshots\multitouch_controller_preview.png"/>
+    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/multitouch_controller_preview.png"/>
 </div>
 
 ---
+
+> A single scripted controller that accepts multiple touches.
+
 ---
 # PATCH LOGS
+
+```
+### Version 1.2.0 [IN PROGRESS] ###
+```
+
+```
+### Version 1.1.2 ###
+- All event arguments now contains global and local position.
+- Controller is completely GUI-based, you can now block the controller using UI element.
+```
+
+```
+### Version 1.1.1 ###
+- Multitouch Controller maximum amount of touch now can be manipulated at runtime.
+```
 
 ```
 ### Version 1.1.0 ###

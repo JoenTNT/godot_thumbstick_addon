@@ -484,6 +484,7 @@ func _on_touch_triggered(index: int, point: Vector2) -> void:
 	_temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE] = _temp_dragged_magnitude;
 	# Cached data.
 	_on_dragged_data.finger_index = index;
+	_on_dragged_data.touch_amount = _current_touch_count;
 	_on_dragged_data.drag_pos = _temp_touch[CACHE_KEY_TOUCH_POSITION];
 	_on_dragged_data.drag_dir = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_DIRECTION];
 	_on_dragged_data.drag_magnitude = _temp_touch[CACHE_KEY_TOUCH_DRAGGED_MAGNITUDE];
