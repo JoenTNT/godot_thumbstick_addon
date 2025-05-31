@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://c3ujowln1lu63"]
 
 [ext_resource type="Texture2D" uid="uid://d07ryinqxn7ob" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/meteor/meteor2.png" id="1_8hsol"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Meteor2D.gd" id="1_33tdu"]
+[ext_resource type="Script" uid="uid://bfvvswadg5egy" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Meteor2D.gd" id="1_33tdu"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_quu4q"]
 radius = 34.8

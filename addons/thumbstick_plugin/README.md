@@ -5,13 +5,13 @@
 </div>
 
 <div align=center>
-    <img src="https://img.shields.io/badge/version-%31%2E%31-green">
-    <a href="./LICENSE">
-        <img src="https://img.shields.io/badge/LICENSE-MIT-blue">
-    </a>
-    <br>
-    <img src="https://img.shields.io/badge/GD_Script-468cbf">
-    <img src="https://img.shields.io/badge/4.3-468cbf">
+	<img src="https://img.shields.io/badge/version-%31%2E%31-green">
+	<a href="./LICENSE">
+		<img src="https://img.shields.io/badge/LICENSE-MIT-blue">
+	</a>
+	<br>
+	<img src="https://img.shields.io/badge/GD_Script-468cbf">
+	<img src="https://img.shields.io/badge/4.3-468cbf">
 </div>
 
 ---
@@ -19,7 +19,7 @@
 > A __Single Scripted__ and <ins>(yet) __most convenient__</ins> mobile controller setup element and connector. This plugin included presets and detailed debug information mainly used for easy mobile controller setup validation.
 
 <div align=center>
-    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/preview_joysticks.png">
+	<img src="/addons/thumbstick_plugin/sample_projects/screenshots/preview_joysticks.png">
 </div>
 
 ## PLUGIN FEATURES
@@ -56,8 +56,8 @@ You can completely manually customize yourself by editing or duplicating presets
 ---
 
 <div align=center>
-    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/properties_1.png" height=410px/>
-    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/properties_2.png" height=410px/>
+	<img src="/addons/thumbstick_plugin/sample_projects/screenshots/properties_1.png" height=410px/>
+	<img src="/addons/thumbstick_plugin/sample_projects/screenshots/properties_2.png" height=410px/>
 </div>
 
 ---
@@ -65,22 +65,22 @@ You can completely manually customize yourself by editing or duplicating presets
 ### List of Properties
 
 1. `Mode`, Settings joystick behavior between `Static`, `Dynamic`, or `Follow`.
-    - `Static`, Joystick doesn't move, it will always at dev setup position on screen.
-        - Additional Settings : `Extend Static Area Trigger`, Extends rectangular static touch trigger area for joystick static mode.
-    - `Dynamic`, Every time the joystick area is pressed, the joystick position is set on the touched position.
-    - `Follow`, When the finger moves outside the joystick area, the joystick will follow it.
-        - Additional Settings : `Follow Radius Tolerance`, Extra radius in joystick follow mode to prevents joystick display move until exceeds this tolerance.
+	- `Static`, Joystick doesn't move, it will always at dev setup position on screen.
+		- Additional Settings : `Extend Static Area Trigger`, Extends rectangular static touch trigger area for joystick static mode.
+	- `Dynamic`, Every time the joystick area is pressed, the joystick position is set on the touched position.
+	- `Follow`, When the finger moves outside the joystick area, the joystick will follow it.
+		- Additional Settings : `Follow Radius Tolerance`, Extra radius in joystick follow mode to prevents joystick display move until exceeds this tolerance.
 2. `Input Mode`, input mode based on direction input limitation.
-    - `Normal`, This is the default 2 axis direction joystick input.
-    - `Horizontal Only`, Joystick can be moved only horizontally.
-    - `Vertical Only`, Joystick can be moved only vertically.
+	- `Normal`, This is the default 2 axis direction joystick input.
+	- `Horizontal Only`, Joystick can be moved only horizontally.
+	- `Vertical Only`, Joystick can be moved only vertically.
 
 ---
 
 ### **B. MULTITOUCH CONTROLLER**
 
 <div align=center>
-    <img src="/addons/thumbstick_plugin/sample_projects/screenshots/multitouch_controller_preview.png"/>
+	<img src="/addons/thumbstick_plugin/sample_projects/screenshots/multitouch_controller_preview.png"/>
 </div>
 
 ---

@@ -1,13 +1,13 @@
 [gd_scene load_steps=13 format=3 uid="uid://b4pc5hwqooo0o"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_FingerChoiceManager.gd" id="1_jtj3h"]
+[ext_resource type="Script" uid="uid://datan2x38ahb4" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_FingerChoiceManager.gd" id="1_jtj3h"]
 [ext_resource type="PackedScene" uid="uid://8skifg2uq8yj" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/pointer_color.tscn" id="2_axa5y"]
 [ext_resource type="PackedScene" uid="uid://b6j27wv1bqel7" path="res://addons/thumbstick_plugin/plugin/controllers/multitouch_controller.tscn" id="2_vgney"]
 [ext_resource type="Texture2D" uid="uid://bktduuc66312k" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/square4x4.png" id="3_ey13x"]
-[ext_resource type="Shader" path="res://addons/thumbstick_plugin/sample_projects/shaders/background-hole.gdshader" id="3_ffs46"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_BackgroundHoleSetter.gd" id="5_0pprm"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/UI_SAMPLE_PlayerCountEdit.gd" id="7_4u60v"]
-[ext_resource type="Shader" path="res://addons/thumbstick_plugin/sample_projects/shaders/triangle.gdshader" id="8_6ndcl"]
+[ext_resource type="Shader" uid="uid://ksamvnfb2w5c" path="res://addons/thumbstick_plugin/sample_projects/shaders/background-hole.gdshader" id="3_ffs46"]
+[ext_resource type="Script" uid="uid://b0mk8m377vbl0" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_BackgroundHoleSetter.gd" id="5_0pprm"]
+[ext_resource type="Script" uid="uid://betps7fxdxjps" path="res://addons/thumbstick_plugin/sample_projects/scripts/UI_SAMPLE_PlayerCountEdit.gd" id="7_4u60v"]
+[ext_resource type="Shader" uid="uid://b6aybrypnc68i" path="res://addons/thumbstick_plugin/sample_projects/shaders/triangle.gdshader" id="8_6ndcl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_q7qw7"]
 shader = ExtResource("3_ffs46")

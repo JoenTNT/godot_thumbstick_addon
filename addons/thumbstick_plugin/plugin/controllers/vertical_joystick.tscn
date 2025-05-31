@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://cc2dgjii6ccqn"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/plugin/scripts/UI_JoystickController.gd" id="1_ufj3m"]
+[ext_resource type="Script" uid="uid://degxod36m6542" path="res://addons/thumbstick_plugin/plugin/scripts/UI_JoystickController.gd" id="1_ufj3m"]
 [ext_resource type="Texture2D" uid="uid://c30cvy5xlx0wy" path="res://addons/thumbstick_plugin/plugin/builtin_assets/one_way_outer_v.png" id="2_abryb"]
 [ext_resource type="Texture2D" uid="uid://c1mcwfteyrsiy" path="res://addons/thumbstick_plugin/plugin/builtin_assets/outer_background.png" id="3_0a60q"]
 [ext_resource type="Texture2D" uid="uid://dd75abhooyi32" path="res://addons/thumbstick_plugin/plugin/builtin_assets/inner_control.png" id="4_hyblk"]

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b6j27wv1bqel7"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/plugin/scripts/UI_MultiTouchController.gd" id="1_h01r8"]
+[ext_resource type="Script" uid="uid://ckolg7qkvxrf5" path="res://addons/thumbstick_plugin/plugin/scripts/UI_MultiTouchController.gd" id="1_h01r8"]
 
 [node name="Multitouch Controller" type="Control"]
 layout_mode = 3

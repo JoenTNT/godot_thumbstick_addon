@@ -1,9 +1,9 @@
 [gd_scene load_steps=28 format=3 uid="uid://6cdpyhwscyxl"]
 
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_MeteorSpawner.gd" id="1_2h5cx"]
+[ext_resource type="Script" uid="uid://bsktgkqtnjbl8" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_MeteorSpawner.gd" id="1_2h5cx"]
 [ext_resource type="Texture2D" uid="uid://bbgmeakxmui2" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk3.png" id="1_fyfjd"]
 [ext_resource type="Theme" uid="uid://ckoenjphd51gp" path="res://addons/thumbstick_plugin/sample_projects/assets/tsp_theme.tres" id="1_mqn6o"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Rocket.gd" id="1_t5oqw"]
+[ext_resource type="Script" uid="uid://ds86qdagifpfd" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Rocket.gd" id="1_t5oqw"]
 [ext_resource type="Texture2D" uid="uid://cimth1txmveon" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/circle_32x32.png" id="1_uk3dp"]
 [ext_resource type="PackedScene" uid="uid://7f1tiihm3jvh" path="res://addons/thumbstick_plugin/plugin/controllers/horizontal_joystick.tscn" id="2_4gru8"]
 [ext_resource type="Texture2D" uid="uid://t4nvbk3okhid" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk4.png" id="2_f5sm7"]
@@ -11,11 +11,11 @@
 [ext_resource type="Texture2D" uid="uid://c0cggf5u2lj0a" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/thruster/rk1.png" id="4_xujaw"]
 [ext_resource type="Texture2D" uid="uid://bierq7t1b7uec" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/rocket/rocket.png" id="5_7mq6k"]
 [ext_resource type="PackedScene" uid="uid://nxen3u7u5wgs" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_1.tscn" id="9_0ueyb"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreUpdater.gd" id="10_7i02q"]
+[ext_resource type="Script" uid="uid://dj7leo08j7g7d" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreUpdater.gd" id="10_7i02q"]
 [ext_resource type="PackedScene" uid="uid://c3ujowln1lu63" path="res://addons/thumbstick_plugin/sample_projects/assets/presets/meteor_t_2.tscn" id="10_pjuso"]
 [ext_resource type="AudioStream" uid="uid://db8jrs8nadepn" path="res://addons/thumbstick_plugin/sample_projects/assets/audio/Rocket Thruster Soft.ogg" id="11_3kcyd"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreEmitter.gd" id="11_fc8mw"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Destroyer2D.gd" id="11_kh1pr"]
+[ext_resource type="Script" uid="uid://dmlsr28rdjkke" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_ScoreEmitter.gd" id="11_fc8mw"]
+[ext_resource type="Script" uid="uid://dvw7c3000thjf" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_Destroyer2D.gd" id="11_kh1pr"]
 [ext_resource type="AudioStream" uid="uid://deo32sacns60d" path="res://addons/thumbstick_plugin/sample_projects/assets/audio/Rocket Crashed.ogg" id="12_jagwq"]
 
 [sub_resource type="Environment" id="Environment_hwvhw"]
@@ -100,7 +100,6 @@ environment = SubResource("Environment_hwvhw")
 [node name="Falling Stars" type="GPUParticles2D" parent="2D World"]
 position = Vector2(280, -48)
 amount = 120
-process_material = SubResource("ParticleProcessMaterial_1dyk7")
 texture = ExtResource("1_uk3dp")
 lifetime = 12.0
 preprocess = 8.0
@@ -108,6 +107,7 @@ speed_scale = 2.0
 randomness = 0.1
 fixed_fps = 24
 trail_lifetime = 3.41
+process_material = SubResource("ParticleProcessMaterial_1dyk7")
 
 [node name="Meteor Spawner" type="Area2D" parent="2D World"]
 position = Vector2(270, -108)

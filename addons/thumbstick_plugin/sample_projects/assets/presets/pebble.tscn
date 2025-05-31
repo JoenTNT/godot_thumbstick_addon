@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bn2b4j8n5wv2t"]
 
 [ext_resource type="Texture2D" uid="uid://cimth1txmveon" path="res://addons/thumbstick_plugin/sample_projects/assets/sprites/circle_32x32.png" id="1_kaa2m"]
-[ext_resource type="Script" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_OnTouchColorRandomizer.gd" id="1_tmd15"]
+[ext_resource type="Script" uid="uid://5a71hpoth1u0" path="res://addons/thumbstick_plugin/sample_projects/scripts/SAMPLE_OnTouchColorRandomizer.gd" id="1_tmd15"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ooonl"]
 friction = 0.2
