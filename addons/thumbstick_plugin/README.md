@@ -105,6 +105,7 @@ You can manually customize yourself by editing or duplicating presets available 
 - Updated Multitouch Controller, you can now manipulate maximum finger amount in runtime.
 - All event arguments now contains global and local position.
 - Controller is completely GUI-based, you can now block the controller using UI element.
+- Has been tested and now the plugin supported in Godot 4.4.
 ```
 
 ```
