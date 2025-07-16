@@ -602,10 +602,10 @@ func _ready() -> void:
 
 func _enter_tree() -> void:
 	_running_in_editor = Engine.is_editor_hint();
-	if _running_in_editor: return;
-	_root = get_tree().root;
 	_outer_joystick = $"Outer BG";
 	_inner_joystick = $"Outer BG/Inner CTRL";
+	if _running_in_editor: return;
+	_root = get_tree().root;
 	_on_pressed_data = JoystickOnPressed.new();
 	_on_tap_data = JoystickOnTap.new();
 	_on_trigger_data = JoystickOnTriggered.new();
