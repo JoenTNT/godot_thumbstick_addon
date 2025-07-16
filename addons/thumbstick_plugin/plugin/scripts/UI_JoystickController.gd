@@ -168,15 +168,15 @@ var _show_testing_info: bool = false:
 var _editor_warnings: bool = true;
 
 # Runtime variable data.
-@onready var _root: Window = get_tree().root;
-@onready var _outer_joystick: TextureRect = $"Outer BG";
-@onready var _inner_joystick: TextureRect = $"Outer BG/Inner CTRL";
-@onready var _outer_origin_position: Vector2 = $"Outer BG".global_position;
-@onready var _inner_origin_position: Vector2 = $"Outer BG/Inner CTRL".global_position;
-@onready var _on_pressed_data: JoystickOnPressed = JoystickOnPressed.new();
-@onready var _on_tap_data: JoystickOnTap = JoystickOnTap.new();
-@onready var _on_trigger_data: JoystickOnTriggered = JoystickOnTriggered.new();
-@onready var _on_released_data: JoystickOnReleased = JoystickOnReleased.new();
+var _root: Window = null;
+var _outer_joystick: TextureRect = null;
+var _inner_joystick: TextureRect = null;
+var _outer_origin_position: Vector2 = Vector2.ZERO;
+var _inner_origin_position: Vector2 = Vector2.ZERO;
+var _on_pressed_data: JoystickOnPressed = null;
+var _on_tap_data: JoystickOnTap = null;
+var _on_trigger_data: JoystickOnTriggered = null;
+var _on_released_data: JoystickOnReleased = null;
 
 var _touch_index: int = -1;
 var _touch_pressed_position: Vector2 = Vector2.ZERO;
@@ -594,9 +594,22 @@ func _ready() -> void:
 			"-> emulate_touch_from_mouse\" must be checked.");
 	if _running_in_editor: return;
 	_inside_deadzone = true;
+	_outer_origin_position = _outer_joystick.global_position;
+	_inner_origin_position = _inner_joystick.global_position;
 	_expected_inner_position = _inner_origin_position;
 	_expected_outer_position = _outer_origin_position;
 	set_disabled(joystick_disabled);
+
+func _enter_tree() -> void:
+	_running_in_editor = Engine.is_editor_hint();
+	if _running_in_editor: return;
+	_root = get_tree().root;
+	_outer_joystick = $"Outer BG";
+	_inner_joystick = $"Outer BG/Inner CTRL";
+	_on_pressed_data = JoystickOnPressed.new();
+	_on_tap_data = JoystickOnTap.new();
+	_on_trigger_data = JoystickOnTriggered.new();
+	_on_released_data = JoystickOnReleased.new();
 	# Subscribe events.
 	_root.size_changed.connect(_on_viewport_size_changed);
 

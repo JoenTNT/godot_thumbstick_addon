@@ -133,11 +133,11 @@ var _gizmos_text_hint_color: Color = DEFAULT_GIZMOS_TEXT_COLOR;
 var _editor_warnings: bool = true;
 
 # Runtime variable data.
-@onready var _on_pressed_data: MultiTouchOnPressed = MultiTouchOnPressed.new();
-@onready var _on_dragged_data: MultiTouchOnDragged = MultiTouchOnDragged.new();
-@onready var _on_released_data: MultiTouchOnReleased = MultiTouchOnReleased.new();
-@onready var _on_tapped_data: MultiTouchOnTap = MultiTouchOnTap.new();
-@onready var _on_max_touch_changed_data: MultiTouchOnMaxChanged = MultiTouchOnMaxChanged.new();
+var _on_pressed_data: MultiTouchOnPressed = null;
+var _on_dragged_data: MultiTouchOnDragged = null;
+var _on_released_data: MultiTouchOnReleased = null;
+var _on_tapped_data: MultiTouchOnTap = null;
+var _on_max_touch_changed_data: MultiTouchOnMaxChanged = null;
 var _current_touch_count: int = 0;
 var _cached_touches: Dictionary = {};
 var _temp_touch: Dictionary;
@@ -342,6 +342,22 @@ func _ready() -> void:
 			"-> emulate_touch_from_mouse\" must be checked.");
 	if _running_in_editor: return;
 	_clear_caches();
+
+func _enter_tree() -> void:
+	_running_in_editor = Engine.is_editor_hint();
+	if _running_in_editor: return;
+	_on_pressed_data = MultiTouchOnPressed.new();
+	_on_dragged_data = MultiTouchOnDragged.new();
+	_on_released_data = MultiTouchOnReleased.new();
+	_on_tapped_data = MultiTouchOnTap.new();
+	_on_max_touch_changed_data = MultiTouchOnMaxChanged.new();
+
+func _exit_tree() -> void:
+	_on_pressed_data = null;
+	_on_dragged_data = null;
+	_on_released_data = null;
+	_on_tapped_data = null;
+	_on_max_touch_changed_data = null;
 
 func _process(delta: float) -> void:
 	_running_in_editor = Engine.is_editor_hint();
