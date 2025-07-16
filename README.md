@@ -13,6 +13,7 @@
     <img src="https://img.shields.io/badge/GD_Script-468cbf">
     <img src="https://img.shields.io/badge/4.3-468cbf">
     <img src="https://img.shields.io/badge/4.4-468cbf">
+    <img src="https://img.shields.io/badge/4.5.beta3-468cbf">
 </div>
 
 ---
